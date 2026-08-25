@@ -1,0 +1,43 @@
+services:
+
+  postgres:
+    image: postgres:17.11
+    container_name: piscinapp-core-postgres
+    restart: always
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: piscinappdb
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - piscinappNet
+
+
+volumes:
+  postgres_data:
+    name: postgres-data
+
+
+networks:
+  piscinappNet:
+    name: piscinappNet
+
+
+# Construir la BD
+#> docker compose -f docker-compose-db.yml up -d
+
+# CONSOLA & COMANDOS PostgreSQL
+#> docker exec -it piscinapp-core-postgres psql -U postgres
+#  \?                         Help
+#  \l                         Database list
+#  \connect piscinappdb postgres
+#  \dt                        Table list
+#  \d <table>                 Describe table
+#  \q                         Exit

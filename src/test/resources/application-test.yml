@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/piscinapp_core_test
-    username: piscinapp_test
-    password: piscinapp_test
+    url: jdbc:postgresql://localhost:5432/piscinappdb
+    username: postgres
+    password: postgres
 
   jpa:
     hibernate:
