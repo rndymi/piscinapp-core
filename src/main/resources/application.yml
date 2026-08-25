@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: piscinapp-core
+
+  profiles:
+    default: dev
+
+  jpa:
+    open-in-view: false

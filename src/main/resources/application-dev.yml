@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/piscinapp_core_dev
+    username: piscinapp_dev
+    password: piscinapp_dev
+
+  jpa:
+    hibernate:
+      ddl-auto: update

@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/piscinapp_core_test
+    username: piscinapp_test
+    password: piscinapp_test
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
