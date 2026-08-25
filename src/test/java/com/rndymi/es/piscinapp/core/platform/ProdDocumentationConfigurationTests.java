@@ -15,22 +15,8 @@ class ProdDocumentationConfigurationTests {
     void shouldDisableOpenApiAndSwaggerInProduction()
             throws Exception {
 
-        YamlPropertySourceLoader loader =
-                new YamlPropertySourceLoader();
-
-        List<PropertySource<?>> sources =
-                loader.load(
-                        "application-prod",
-                        new ClassPathResource(
-                                "application-prod.yml"
-                        )
-                );
-
-        assertThat(sources)
-                .isNotEmpty();
-
         PropertySource<?> properties =
-                sources.getFirst();
+                loadProductionProperties();
 
         assertThat(
                 properties.getProperty(
@@ -45,5 +31,42 @@ class ProdDocumentationConfigurationTests {
                 )
         )
                 .isEqualTo(false);
+    }
+
+    @Test
+    void shouldRequireExternalProductionIssuer()
+            throws Exception {
+
+        PropertySource<?> properties =
+                loadProductionProperties();
+
+        assertThat(
+                properties.getProperty(
+                        "piscinapp.security.issuer"
+                )
+        )
+                .isEqualTo(
+                        "${PISCINAPP_SECURITY_ISSUER}"
+                );
+    }
+
+    private PropertySource<?> loadProductionProperties()
+            throws Exception {
+
+        YamlPropertySourceLoader loader =
+                new YamlPropertySourceLoader();
+
+        List<PropertySource<?>> sources =
+                loader.load(
+                        "application-prod",
+                        new ClassPathResource(
+                                "application-prod.yml"
+                        )
+                );
+
+        assertThat(sources)
+                .isNotEmpty();
+
+        return sources.getFirst();
     }
 }

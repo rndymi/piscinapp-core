@@ -17,7 +17,3 @@ management:
   endpoint:
     health:
       show-details: never
-
-piscinapp:
-  security:
-    issuer: ${PISCINAPP_SECURITY_ISSUER:http://localhost:8080}

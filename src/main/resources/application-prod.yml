@@ -17,6 +17,8 @@ springdoc:
 
 piscinapp:
   security:
+    issuer: ${PISCINAPP_SECURITY_ISSUER}
+
     jwt:
       key-store-base64: ${JWT_KEYSTORE_BASE64}
       key-store-password: ${JWT_KEYSTORE_PASSWORD}

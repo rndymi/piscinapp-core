@@ -63,13 +63,7 @@ With Core running locally, check its health:
 curl http://localhost:8080/actuator/health
 ````
 
-Excepted result:
-
-```json
-{
-  "status": "UP"
-}
-```
+Expected result: a health response with `status` equal to `UP`.
 
 Only the minimum Actuator health capability is exposed by the current bootstrap.
 
