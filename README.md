@@ -6,7 +6,7 @@ Current bootstrap version: `v0.0.0`.
 
 ### Technologies
 
-`Java 21` `Spring Boot 4.1.1` `Maven` `PostgreSQL` `Docker`
+`Java 21` `Spring Boot 4.1.1` `Spring MVC` `Spring Security` `OAuth2/OIDC` `Maven` `PostgreSQL` `Docker`
 
 ### Local execution with IntelliJ
 
@@ -55,6 +55,50 @@ Useful commands:
 \q                              Exit
 ```
 
+### Health
+
+With Core running locally, check its health:
+
+```sh
+curl http://localhost:8080/actuator/health
+````
+
+Excepted result:
+
+```json
+{
+  "status": "UP"
+}
+```
+
+Only the minimum Actuator health capability is exposed by the current bootstrap.
+
+### API documentation
+
+With the dev profile, Swagger UI is available at:
+
+* Cliente Web: http://localhost:8080/swagger-ui/index.html
+
+OpenAPI JSON is available at:
+
+* http://localhost:8080/v3/api-docs
+
+Swagger UI and OpenAPI documentation are disabled by configuration in the prod profile.
+
+### Security bootstrap
+
+PiscinApp Core currently provides the technical foundation for:
+
+- Spring Security;
+- OAuth2 Authorization Server;
+- OpenID Connect;
+- OAuth2 Resource Server;
+- Bearer JWT protected resources.
+
+The current bootstrap does not yet provide real PiscinApp users, roles, account administration or final client registrations.
+
+Development and test environments use non-production runtime-generated signing keys. Production signing material must be supplied externally and is never stored in the repository.
+
 ### Tests
 
 With PostgreSQL running:
@@ -75,4 +119,4 @@ Windows with Maven Wrapper:
 mvn clean package
 ```
 
-The project currently contains only the technical bootstrap baseline. Business APIs, authentication, OpenAPI and production deployment will be introduced in later HUs.
+The project currently contains the Core bootstrap and transversal Web, operational and security platform. Functional business APIs, real identity management and production delivery belong to later HUs and versions.
