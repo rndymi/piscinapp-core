@@ -7,3 +7,17 @@ spring:
 
   jpa:
     open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      show-details: never
+
+piscinapp:
+  security:
+    issuer: ${PISCINAPP_SECURITY_ISSUER:http://localhost:8080}

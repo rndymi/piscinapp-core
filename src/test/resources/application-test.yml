@@ -7,3 +7,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+springdoc:
+  api-docs:
+    enabled: true
+
+  swagger-ui:
+    enabled: true
+
+piscinapp:
+  security:
+    issuer: http://localhost:8080

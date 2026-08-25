@@ -7,3 +7,19 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+springdoc:
+  api-docs:
+    enabled: false
+
+  swagger-ui:
+    enabled: false
+
+piscinapp:
+  security:
+    jwt:
+      key-store-base64: ${JWT_KEYSTORE_BASE64}
+      key-store-password: ${JWT_KEYSTORE_PASSWORD}
+      key-password: ${JWT_KEY_PASSWORD}
+      key-alias: ${JWT_KEY_ALIAS}
+      key-id: ${JWT_KEY_ID}
