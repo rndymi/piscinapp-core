@@ -1,2 +1,26 @@
 include:
   - docker-compose-db.yml
+
+
+services:
+
+  piscinapp-core:
+    build: .
+    image: piscinapp-core:latest
+    container_name: piscinapp-core
+    restart: always
+
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/piscinappdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+    depends_on:
+      - postgres
+
+    networks:
+      - piscinappNet
+
+#> docker compose up --build -d
+#> docker logs -f piscinapp-core
