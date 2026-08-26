@@ -50,6 +50,21 @@ class ProdDocumentationConfigurationTests {
                 );
     }
 
+    @Test
+    void shouldUseFrameworkForwardedHeadersInProduction()
+            throws Exception {
+
+        PropertySource<?> properties =
+                loadProductionProperties();
+
+        assertThat(
+                properties.getProperty(
+                        "server.forward-headers-strategy"
+                )
+        )
+                .isEqualTo("framework");
+    }
+
     private PropertySource<?> loadProductionProperties()
             throws Exception {
 

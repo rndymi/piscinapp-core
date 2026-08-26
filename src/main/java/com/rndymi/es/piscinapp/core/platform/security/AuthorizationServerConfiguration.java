@@ -21,7 +21,7 @@ public class AuthorizationServerConfiguration {
     @Order(1)
     SecurityFilterChain authorizationServerSecurityFilterChain(
             HttpSecurity http
-    ) throws Exception {
+    ) {
 
         http.oauth2AuthorizationServer(
                 authorizationServer -> {

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +18,7 @@ public class ResourceServerConfiguration {
     @Order(2)
     SecurityFilterChain resourceServerSecurityFilterChain(
             HttpSecurity http
-    ) throws Exception {
+    ) {
 
         return http
                 .csrf(
@@ -51,14 +52,8 @@ public class ResourceServerConfiguration {
                                         Customizer.withDefaults()
                                 )
                 )
-                .httpBasic(
-                        httpBasic ->
-                                httpBasic.disable()
-                )
-                .formLogin(
-                        formLogin ->
-                                formLogin.disable()
-                )
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
 
