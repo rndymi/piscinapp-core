@@ -4,9 +4,13 @@ Backend service of the PiscinApp ecosystem.
 
 Current bootstrap version: `v0.0.0`.
 
+---
+
 ### Technologies
 
 `Java 21` `Spring Boot 4.1.1` `Spring MVC` `Spring Security` `OAuth2/OIDC` `Maven` `PostgreSQL` `Docker`
+
+---
 
 ### Local execution with IntelliJ
 
@@ -17,6 +21,8 @@ docker compose -f docker-compose-db.yml up -d
 ```
 
 Run `CoreApplication` from IntelliJ IDEA.
+
+---
 
 ### Local execution with Docker
 
@@ -38,6 +44,8 @@ Stop the local stack:
 docker compose down
 ```
 
+---
+
 ### PostgreSQL
 
 Open the PostgreSQL console:
@@ -55,6 +63,8 @@ Useful commands:
 \q                              Exit
 ```
 
+---
+
 ### Health
 
 With Core running locally, check its health:
@@ -67,6 +77,8 @@ Expected result: a health response with `status` equal to `UP`.
 
 Only the minimum Actuator health capability is exposed by the current bootstrap.
 
+---
+
 ### API documentation
 
 With the dev profile, Swagger UI is available at:
@@ -78,6 +90,8 @@ OpenAPI JSON is available at:
 * http://localhost:8080/v3/api-docs
 
 Swagger UI and OpenAPI documentation are disabled by configuration in the prod profile.
+
+---
 
 ### Security bootstrap
 
@@ -93,6 +107,8 @@ The current bootstrap does not yet provide real PiscinApp users, roles, account 
 
 Development and test environments use non-production runtime-generated signing keys. Production signing material must be supplied externally and is never stored in the repository.
 
+---
+
 ### Tests
 
 With PostgreSQL running:
@@ -106,6 +122,55 @@ Windows with Maven Wrapper:
 ```sh
 .\mvnw.cmd test
 ```
+
+---
+
+### Automated verification
+
+The complete local verification lifecycle is:
+
+```sh
+mvn -B verify
+```
+Windows:
+
+```sh
+.\mvnw.cmd -B verify
+```
+
+Verification executes the current Core test suite and generates the JaCoCo coverage report at:
+
+```text
+target/site/jacoco/index.html
+```
+
+GitHub Actions performs the same Maven verification against PostgreSQL, runs SonarCloud analysis, evaluates the configured Quality Gate, and validates that the production-oriented Core Docker image remains buildable.
+
+---
+
+### FAKE_PROD
+
+Core participates in the ecosystem-owned FAKE_PROD environment using its normal Spring `prod` profile.
+
+The runtime contract is provided through external configuration such as:
+
+```text
+DATABASE_URL
+DATABASE_USERNAME
+DATABASE_PASSWORD
+PISCINAPP_SECURITY_ISSUER
+JWT_KEYSTORE_BASE64
+JWT_KEYSTORE_PASSWORD
+JWT_KEY_PASSWORD
+JWT_KEY_ALIAS
+JWT_KEY_ID
+```
+
+Shared Nginx and Floci orchestration belongs to the `rndymi/piscinapp` repository.
+
+FAKE_PROD validates the production-shaped Core container, PostgreSQL connectivity and Nginx integration using emulated AWS-compatible infrastructure. It does not represent a real public AWS production deployment.
+
+---
 
 ### Build
 
