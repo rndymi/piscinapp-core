@@ -116,7 +116,7 @@ class InitialAdminBootstrapTests {
                 .createAccount(
                         any(),
                         any(),
-                        any(Boolean.class),
+                        eq(true),
                         any()
                 );
     }

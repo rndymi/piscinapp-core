@@ -2,7 +2,7 @@
 
 Backend service of the PiscinApp ecosystem.
 
-Current bootstrap version: `v0.0.0`.
+Current bootstrap version: `v1.0.0`.
 
 ---
 
@@ -93,19 +93,48 @@ Swagger UI and OpenAPI documentation are disabled by configuration in the prod p
 
 ---
 
-### Security bootstrap
+### Identity bootstrap
 
-PiscinApp Core currently provides the technical foundation for:
+PiscinApp Core persists application security accounts in PostgreSQL.
 
-- Spring Security;
-- OAuth2 Authorization Server;
-- OpenID Connect;
-- OAuth2 Resource Server;
-- Bearer JWT protected resources.
+Accounts contain:
 
-The current bootstrap does not yet provide real PiscinApp users, roles, account administration or final client registrations.
+- a stable UUID;
+- a normalized username;
+- an encoded password;
+- enabled/disabled state;
+- `USER` and `ADMIN` security roles.
 
-Development and test environments use non-production runtime-generated signing keys. Production signing material must be supplied externally and is never stored in the repository.
+To create the first administrator in a fresh local database, provide:
+
+```text
+PISCINAPP_BOOTSTRAP_ADMIN_USERNAME
+PISCINAPP_BOOTSTRAP_ADMIN_PASSWORD
+```
+
+The password must contain between 12 and 128 characters.
+
+Example for PowerShell:
+
+```sh
+$env:PISCINAPP_BOOTSTRAP_ADMIN_USERNAME="local.admin"
+$env:PISCINAPP_BOOTSTRAP_ADMIN_PASSWORD="local-admin-password"
+```
+
+Then run Core normally.
+
+The initial administrator receives both:
+
+```text
+USER
+ADMIN
+```
+
+Bootstrap is idempotent. Once an administrator already exists, restarting Core does not create another administrator and does not modify the existing administrator username or password.
+
+Bootstrap credentials are initial runtime configuration and must never be committed to the repository.
+
+OAuth2/OIDC client authentication, role-aware JWT behavior and account-administration REST APIs belong to later v1.0.0 HUs.
 
 ---
 
@@ -178,4 +207,4 @@ FAKE_PROD validates the production-shaped Core container, PostgreSQL connectivit
 mvn clean package
 ```
 
-The project currently contains the Core bootstrap and transversal Web, operational and security platform. Functional business APIs, real identity management and production delivery belong to later HUs and versions.
+The project currently contains the Core transversal platform and the persistent PiscinApp identity foundation. OAuth2/OIDC client authentication, account administration and functional business APIs belong to later HUs and versions.
