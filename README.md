@@ -105,34 +105,47 @@ Accounts contain:
 - enabled/disabled state;
 - `USER` and `ADMIN` security roles.
 
-To create the first administrator in a fresh local database, provide:
+---
+
+### DEV initial administrator
+
+Normal DEV execution automatically provisions a disposable local administrator using fictitious values stored in the versioned DEV configuration.
+
+Default DEV identity:
+
+```text
+username: local.admin
+password: local-admin-password
+```
+
+These values are development-only credentials. They do not grant access to any real environment and must never be reused for FAKE_PROD or PROD.
+
+A normal local startup requires only:
+
+```bash
+docker compose -f docker-compose-db.yml up -d
+```
+
+Then run `CoreApplication` normally.
+
+No bootstrap environment variables need to be exported manually and no IntelliJ IDEA Run/Debug environment configuration is required.
+
+Bootstrap is idempotent. Once an administrator exists, restarting Core does not create another administrator and does not modify the persisted administrator credentials.
+
+---
+
+### Production-shaped bootstrap
+
+The same Spring configuration contract can be supplied externally through:
 
 ```text
 PISCINAPP_BOOTSTRAP_ADMIN_USERNAME
 PISCINAPP_BOOTSTRAP_ADMIN_PASSWORD
 ```
 
-The password must contain between 12 and 128 characters.
+These variables are intended for production-shaped runtime configuration or explicit configuration overrides.
 
-Example for PowerShell:
-
-```sh
-$env:PISCINAPP_BOOTSTRAP_ADMIN_USERNAME="local.admin"
-$env:PISCINAPP_BOOTSTRAP_ADMIN_PASSWORD="local-admin-password"
-```
-
-Then run Core normally.
-
-The initial administrator receives both:
-
-```text
-USER
-ADMIN
-```
-
-Bootstrap is idempotent. Once an administrator already exists, restarting Core does not create another administrator and does not modify the existing administrator username or password.
-
-Bootstrap credentials are initial runtime configuration and must never be committed to the repository.
+Real production credentials must never be committed to the repository.
 
 OAuth2/OIDC client authentication, role-aware JWT behavior and account-administration REST APIs belong to later v1.0.0 HUs.
 

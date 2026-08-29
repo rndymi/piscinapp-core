@@ -18,3 +18,8 @@ springdoc:
 piscinapp:
   security:
     issuer: ${PISCINAPP_SECURITY_ISSUER:http://localhost:8080}
+
+  bootstrap:
+    admin:
+      username: local.admin
+      password: local-admin-password
