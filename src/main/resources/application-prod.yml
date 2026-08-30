@@ -28,3 +28,15 @@ piscinapp:
       key-password: ${JWT_KEY_PASSWORD}
       key-alias: ${JWT_KEY_ALIAS}
       key-id: ${JWT_KEY_ID}
+
+    oauth2:
+      access-token-time-to-live: ${PISCINAPP_ACCESS_TOKEN_TTL:15m}
+
+      clients:
+        validation:
+          enabled: ${PISCINAPP_VALIDATION_CLIENT_ENABLED:false}
+          client-id: ${PISCINAPP_VALIDATION_CLIENT_ID:piscinapp-validation}
+          redirect-uri: ${PISCINAPP_VALIDATION_CLIENT_REDIRECT_URI:}
+          scopes:
+            - openid
+            - profile

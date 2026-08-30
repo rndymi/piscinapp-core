@@ -151,6 +151,50 @@ OAuth2/OIDC client authentication, role-aware JWT behavior and account-administr
 
 ---
 
+### OAuth2 / OpenID Connect authentication
+
+PiscinApp Core acts as both an OAuth2/OpenID Connect Authorization Server and a Bearer-token Resource Server.
+
+Persisted PiscinApp accounts authenticate through the Authorization Code flow with PKCE. Access tokens are signed JWTs and include the account security roles required by Core authorization.
+
+---
+
+### DEV Swagger authentication
+
+Swagger UI is available in DEV at:
+
+* http://localhost:8080/swagger-ui/index.html
+
+The DEV OAuth2 client is:
+
+```text
+piscinapp-swagger
+```
+It is a public client:
+
+```text
+Authorization Code
+PKCE required
+no client secret
+```
+The registered redirect URI is:
+
+* http://localhost:8080/swagger-ui/oauth2-redirect.html
+
+Use the Swagger Authorize action to authenticate through the real PiscinApp Authorization Server.
+
+The local disposable administrator created by the DEV bootstrap can be used for local validation.
+
+Bearer access tokens protect application resources and contain PiscinApp USER / ADMIN role information.
+
+Swagger UI and OpenAPI documentation remain disabled under the prod profile.
+
+Final OAuth2 client registrations for piscinapp-control and piscinapp-field are not defined yet. They will be introduced when those clients have real redirect and deployment contracts.
+
+Account-management REST APIs are also outside this stage and belong to the next Identity and Access Management HU.
+
+---
+
 ### Tests
 
 With PostgreSQL running:

@@ -3,21 +3,23 @@ package com.rndymi.es.piscinapp.core.platform.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class ResourceServerConfiguration {
 
     @Bean
-    @Order(2)
+    @Order(3)
     SecurityFilterChain resourceServerSecurityFilterChain(
-            HttpSecurity http
+            HttpSecurity http,
+            JwtAuthenticationConverter
+                    jwtAuthenticationConverter
     ) {
 
         return http
@@ -30,7 +32,8 @@ public class ResourceServerConfiguration {
                 .sessionManagement(
                         session ->
                                 session.sessionCreationPolicy(
-                                        SessionCreationPolicy.STATELESS
+                                        SessionCreationPolicy
+                                                .STATELESS
                                 )
                 )
                 .authorizeHttpRequests(
@@ -43,22 +46,52 @@ public class ResourceServerConfiguration {
                                                 "/swagger-ui/**"
                                         )
                                         .permitAll()
+                                        .requestMatchers(
+                                                "/api/security-test/admin"
+                                        )
+                                        .hasRole("ADMIN")
+                                        .requestMatchers(
+                                                "/api/security-test/user"
+                                        )
+                                        .hasRole("USER")
                                         .anyRequest()
                                         .authenticated()
                 )
                 .oauth2ResourceServer(
                         resourceServer ->
                                 resourceServer.jwt(
-                                        Customizer.withDefaults()
+                                        jwt ->
+                                                jwt.jwtAuthenticationConverter(
+                                                        jwtAuthenticationConverter
+                                                )
                                 )
                 )
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(
+                        AbstractHttpConfigurer::disable
+                )
+                .formLogin(
+                        AbstractHttpConfigurer::disable
+                )
                 .build();
     }
 
     @Bean
+    JwtAuthenticationConverter
+    jwtAuthenticationConverter() {
+
+        JwtAuthenticationConverter converter =
+                new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(
+                new JwtRoleAuthoritiesConverter()
+        );
+
+        return converter;
+    }
+
+    @Bean
     PasswordEncoder passwordEncoder() {
+
         return PasswordEncoderFactories
                 .createDelegatingPasswordEncoder();
     }

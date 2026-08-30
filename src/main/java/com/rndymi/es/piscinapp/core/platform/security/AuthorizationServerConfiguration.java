@@ -6,13 +6,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 @Configuration
 public class AuthorizationServerConfiguration {
@@ -26,7 +29,8 @@ public class AuthorizationServerConfiguration {
         http.oauth2AuthorizationServer(
                 authorizationServer -> {
                     http.securityMatcher(
-                            authorizationServer.getEndpointsMatcher()
+                            authorizationServer
+                                    .getEndpointsMatcher()
                     );
 
                     authorizationServer.oidc(
@@ -42,20 +46,44 @@ public class AuthorizationServerConfiguration {
                                 .authenticated()
         );
 
+        http.exceptionHandling(
+                exceptions ->
+                        exceptions
+                                .defaultAuthenticationEntryPointFor(
+                                        new LoginUrlAuthenticationEntryPoint(
+                                                "/login"
+                                        ),
+                                        new MediaTypeRequestMatcher(
+                                                MediaType.TEXT_HTML
+                                        )
+                                )
+        );
+
         return http.build();
     }
 
     @Bean
-    RegisteredClientRepository registeredClientRepository() {
-        return new BootstrapRegisteredClientRepository();
-    }
-
-    @Bean
     JwtDecoder jwtDecoder(
-            JWKSource<SecurityContext> jwkSource
+            JWKSource<SecurityContext> jwkSource,
+            @Value("${piscinapp.security.issuer}")
+            String issuer
     ) {
-        return OAuth2AuthorizationServerConfiguration
-                .jwtDecoder(jwkSource);
+
+        NimbusJwtDecoder jwtDecoder =
+                NimbusJwtDecoder
+                        .withJwkSource(
+                                jwkSource
+                        )
+                        .build();
+
+        jwtDecoder.setJwtValidator(
+                JwtValidators
+                        .createDefaultWithIssuer(
+                                issuer
+                        )
+        );
+
+        return jwtDecoder;
     }
 
     @Bean
@@ -63,7 +91,9 @@ public class AuthorizationServerConfiguration {
             @Value("${piscinapp.security.issuer}")
             String issuer
     ) {
-        return AuthorizationServerSettings.builder()
+
+        return AuthorizationServerSettings
+                .builder()
                 .issuer(issuer)
                 .build();
     }

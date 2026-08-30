@@ -15,9 +15,28 @@ springdoc:
   swagger-ui:
     enabled: true
 
+    oauth:
+      client-id: piscinapp-swagger
+      scopes:
+        - openid
+        - profile
+      use-pkce-with-authorization-code-grant: true
+
 piscinapp:
   security:
     issuer: ${PISCINAPP_SECURITY_ISSUER:http://localhost:8080}
+
+    oauth2:
+      access-token-time-to-live: 15m
+
+      clients:
+        swagger:
+          enabled: true
+          client-id: piscinapp-swagger
+          redirect-uri: http://localhost:8080/swagger-ui/oauth2-redirect.html
+          scopes:
+            - openid
+            - profile
 
   bootstrap:
     admin:

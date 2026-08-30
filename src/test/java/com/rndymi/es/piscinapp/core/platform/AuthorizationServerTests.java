@@ -76,4 +76,30 @@ class AuthorizationServerTests {
                                 .doesNotExist()
                 );
     }
+
+    @Test
+    void shouldAdvertiseAuthorizationCodeSupport()
+            throws Exception {
+
+        mockMvc.perform(
+                        get(
+                                "/.well-known/openid-configuration"
+                        )
+                )
+                .andExpect(
+                        status().isOk()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.response_types_supported"
+                        )
+                                .isArray()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.grant_types_supported"
+                        )
+                                .isArray()
+                );
+    }
 }
