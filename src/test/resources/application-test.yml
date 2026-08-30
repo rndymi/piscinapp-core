@@ -19,6 +19,18 @@ piscinapp:
   security:
     issuer: http://localhost:8080
 
+    oauth2:
+      access-token-time-to-live: 15m
+
+      clients:
+        test:
+          enabled: true
+          client-id: piscinapp-test
+          redirect-uri: https://client.example.test/callback
+          scopes:
+            - openid
+            - profile
+
   bootstrap:
     admin:
       username: test.admin
