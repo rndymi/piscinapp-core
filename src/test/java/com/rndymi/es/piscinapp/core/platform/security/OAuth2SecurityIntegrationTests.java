@@ -1,6 +1,8 @@
 package com.rndymi.es.piscinapp.core.platform.security;
 
 import com.jayway.jsonpath.JsonPath;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import com.rndymi.es.piscinapp.core.identity.application.UserAccountService;
 import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
 import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
@@ -11,8 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
@@ -59,6 +67,10 @@ class OAuth2SecurityIntegrationTests {
 
     @Autowired
     private JwtDecoder jwtDecoder;
+
+    @Autowired
+    private JWKSource<SecurityContext>
+            jwkSource;
 
     @BeforeEach
     void setUp() {
@@ -271,14 +283,8 @@ class OAuth2SecurityIntegrationTests {
                 );
 
         String tamperedToken =
-                accessToken.substring(
-                        0,
-                        accessToken.length() - 1
-                )
-                        + (
-                        accessToken.endsWith("A")
-                                ? "B"
-                                : "A"
+                tamperJwtSignature(
+                        accessToken
                 );
 
         mockMvc.perform(
@@ -406,6 +412,271 @@ class OAuth2SecurityIntegrationTests {
                                         )
                                 )
                         )
+                );
+    }
+
+    @Test
+    void shouldRejectInvalidRedirectUri()
+            throws Exception {
+
+        userAccountService.createAccount(
+                "oauth.user",
+                PASSWORD,
+                true,
+                Set.of(
+                        SecurityRole.USER
+                )
+        );
+
+        MockHttpSession session =
+                login(
+                        "oauth.user"
+                );
+
+        String verifier =
+                "piscinapp-invalid-redirect-verifier-12345678901234567890";
+
+        String challenge =
+                createCodeChallenge(
+                        verifier
+                );
+
+        mockMvc.perform(
+                        get("/oauth2/authorize")
+                                .session(session)
+                                .queryParam(
+                                        "response_type",
+                                        "code"
+                                )
+                                .queryParam(
+                                        "client_id",
+                                        CLIENT_ID
+                                )
+                                .queryParam(
+                                        "redirect_uri",
+                                        "https://invalid.example.test/callback"
+                                )
+                                .queryParam(
+                                        "scope",
+                                        "openid profile"
+                                )
+                                .queryParam(
+                                        "code_challenge",
+                                        challenge
+                                )
+                                .queryParam(
+                                        "code_challenge_method",
+                                        "S256"
+                                )
+                )
+                .andExpect(
+                        status().isBadRequest()
+                );
+    }
+
+    @Test
+    void shouldRejectUnknownClientAtProtocolLevel()
+            throws Exception {
+
+        userAccountService.createAccount(
+                "oauth.user",
+                PASSWORD,
+                true,
+                Set.of(
+                        SecurityRole.USER
+                )
+        );
+
+        MockHttpSession session =
+                login(
+                        "oauth.user"
+                );
+
+        String verifier =
+                "piscinapp-unknown-client-verifier-12345678901234567890";
+
+        String challenge =
+                createCodeChallenge(
+                        verifier
+                );
+
+        mockMvc.perform(
+                        get("/oauth2/authorize")
+                                .session(session)
+                                .queryParam(
+                                        "response_type",
+                                        "code"
+                                )
+                                .queryParam(
+                                        "client_id",
+                                        "unknown-client"
+                                )
+                                .queryParam(
+                                        "redirect_uri",
+                                        REDIRECT_URI
+                                )
+                                .queryParam(
+                                        "scope",
+                                        "openid profile"
+                                )
+                                .queryParam(
+                                        "code_challenge",
+                                        challenge
+                                )
+                                .queryParam(
+                                        "code_challenge_method",
+                                        "S256"
+                                )
+                )
+                .andExpect(
+                        status().isBadRequest()
+                );
+    }
+
+    @Test
+    void shouldRejectAuthorizationCodeReuse()
+            throws Exception {
+
+        userAccountService.createAccount(
+                "oauth.user",
+                PASSWORD,
+                true,
+                Set.of(
+                        SecurityRole.USER
+                )
+        );
+
+        String verifier =
+                "piscinapp-code-reuse-verifier-123456789012345678901234567890";
+
+        String code =
+                obtainAuthorizationCode(
+                        "oauth.user",
+                        verifier
+                );
+
+        mockMvc.perform(
+                        post("/oauth2/token")
+                                .contentType(
+                                        MediaType.APPLICATION_FORM_URLENCODED
+                                )
+                                .param(
+                                        "grant_type",
+                                        "authorization_code"
+                                )
+                                .param(
+                                        "client_id",
+                                        CLIENT_ID
+                                )
+                                .param(
+                                        "code",
+                                        code
+                                )
+                                .param(
+                                        "redirect_uri",
+                                        REDIRECT_URI
+                                )
+                                .param(
+                                        "code_verifier",
+                                        verifier
+                                )
+                )
+                .andExpect(
+                        status().isOk()
+                );
+
+        mockMvc.perform(
+                        post("/oauth2/token")
+                                .contentType(
+                                        MediaType.APPLICATION_FORM_URLENCODED
+                                )
+                                .param(
+                                        "grant_type",
+                                        "authorization_code"
+                                )
+                                .param(
+                                        "client_id",
+                                        CLIENT_ID
+                                )
+                                .param(
+                                        "code",
+                                        code
+                                )
+                                .param(
+                                        "redirect_uri",
+                                        REDIRECT_URI
+                                )
+                                .param(
+                                        "code_verifier",
+                                        verifier
+                                )
+                )
+                .andExpect(
+                        status().isBadRequest()
+                );
+    }
+
+    @Test
+    void shouldRejectExpiredToken()
+            throws Exception {
+
+        Instant now =
+                Instant.now();
+
+        String expiredToken =
+                createSignedAccessToken(
+                        "http://localhost:8080",
+                        now.minusSeconds(
+                                1200
+                        ),
+                        now.minusSeconds(
+                                300
+                        )
+                );
+
+        mockMvc.perform(
+                        get(
+                                "/api/security-test/user"
+                        )
+                                .header(
+                                        "Authorization",
+                                        "Bearer "
+                                                + expiredToken
+                                )
+                )
+                .andExpect(
+                        status().isUnauthorized()
+                );
+    }
+
+    @Test
+    void shouldRejectTokenWithIncorrectIssuer()
+            throws Exception {
+
+        Instant now =
+                Instant.now();
+
+        String token =
+                createSignedAccessToken(
+                        "https://wrong-issuer.example.test",
+                        now,
+                        now.plusSeconds(
+                                900
+                        )
+                );
+
+        mockMvc.perform(
+                        get(
+                                "/api/security-test/user"
+                        )
+                                .header(
+                                        "Authorization",
+                                        "Bearer "
+                                                + token
+                                )
+                )
+                .andExpect(
+                        status().isUnauthorized()
                 );
     }
 
@@ -590,5 +861,101 @@ class OAuth2SecurityIntegrationTests {
                 .encodeToString(
                         digest
                 );
+    }
+
+    private String createSignedAccessToken(
+            String issuer,
+            Instant issuedAt,
+            Instant expiresAt
+    ) {
+
+        NimbusJwtEncoder jwtEncoder =
+                new NimbusJwtEncoder(
+                        jwkSource
+                );
+
+        JwsHeader jwsHeader =
+                JwsHeader
+                        .with(
+                                SignatureAlgorithm.RS256
+                        )
+                        .build();
+
+        JwtClaimsSet claims =
+                JwtClaimsSet
+                        .builder()
+                        .issuer(
+                                issuer
+                        )
+                        .subject(
+                                "oauth.test"
+                        )
+                        .issuedAt(
+                                issuedAt
+                        )
+                        .expiresAt(
+                                expiresAt
+                        )
+                        .claim(
+                                "roles",
+                                List.of(
+                                        "USER"
+                                )
+                        )
+                        .build();
+
+        return jwtEncoder
+                .encode(
+                        JwtEncoderParameters.from(
+                                jwsHeader,
+                                claims
+                        )
+                )
+                .getTokenValue();
+    }
+
+    private String tamperJwtSignature(
+            String token
+    ) {
+
+        String[] parts =
+                token.split("\\.");
+
+        if (parts.length != 3) {
+
+            throw new IllegalArgumentException(
+                    "Expected a signed JWT"
+            );
+        }
+
+        String signature =
+                parts[2];
+
+        int position =
+                signature.length() / 2;
+
+        char original =
+                signature.charAt(position);
+
+        char replacement =
+                original == 'A'
+                        ? 'B'
+                        : 'A';
+
+        String tamperedSignature =
+                signature.substring(
+                        0,
+                        position
+                )
+                        + replacement
+                        + signature.substring(
+                        position + 1
+                );
+
+        return parts[0]
+                + "."
+                + parts[1]
+                + "."
+                + tamperedSignature;
     }
 }
