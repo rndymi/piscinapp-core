@@ -2,7 +2,7 @@
 
 Backend service of the PiscinApp ecosystem.
 
-Current bootstrap version: `v1.0.0`.
+Current stable version: `v1.0.0`.
 
 ---
 
@@ -266,7 +266,12 @@ The runtime contract is provided through external configuration such as:
 DATABASE_URL
 DATABASE_USERNAME
 DATABASE_PASSWORD
+PISCINAPP_BOOTSTRAP_ADMIN_USERNAME
+PISCINAPP_BOOTSTRAP_ADMIN_PASSWORD
 PISCINAPP_SECURITY_ISSUER
+PISCINAPP_VALIDATION_CLIENT_ENABLED
+PISCINAPP_VALIDATION_CLIENT_ID
+PISCINAPP_VALIDATION_CLIENT_REDIRECT_URI
 JWT_KEYSTORE_BASE64
 JWT_KEYSTORE_PASSWORD
 JWT_KEY_PASSWORD
@@ -286,4 +291,8 @@ FAKE_PROD validates the production-shaped Core container, PostgreSQL connectivit
 mvn clean package
 ```
 
-The project currently contains the Core transversal platform and the persistent PiscinApp identity foundation. OAuth2/OIDC client authentication, account administration and functional business APIs belong to later HUs and versions.
+---
+
+PiscinApp Core `v1.0.0` provides the first stable Identity and Access Management capability of the ecosystem, including persistent USER/ADMIN accounts, secure administrator bootstrap, OAuth2/OpenID Connect Authorization Code with PKCE, signed role-aware JWT Bearer authorization and the versioned `/api/v1` Identity administration API.
+
+The release has been validated through the ecosystem-owned FAKE_PROD environment using the production-shaped Nginx, container and PostgreSQL boundaries. FAKE_PROD uses emulated AWS-compatible infrastructure and does not represent a real public AWS production deployment.
