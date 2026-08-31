@@ -1,5 +1,6 @@
 package com.rndymi.es.piscinapp.core.identity.application;
 
+import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
 import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
 import com.rndymi.es.piscinapp.core.identity.domain.UserAccount;
 import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
@@ -63,7 +64,7 @@ class UserAccountServiceTests {
                 );
 
         when(
-                repository.save(
+                repository.saveAndFlush(
                         any(UserAccount.class)
                 )
         )
@@ -87,7 +88,7 @@ class UserAccountServiceTests {
                         UserAccount.class
                 );
 
-        verify(repository).save(
+        verify(repository).saveAndFlush(
                 captor.capture()
         );
 
@@ -235,7 +236,7 @@ class UserAccountServiceTests {
                         )
         )
                 .isInstanceOf(
-                        IllegalStateException.class
+                        UsernameConflictException.class
                 )
                 .hasMessage(
                         "Username already exists"

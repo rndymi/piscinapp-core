@@ -110,4 +110,36 @@ public class UserAccount {
     public Set<SecurityRole> getRoles() {
         return Collections.unmodifiableSet(roles);
     }
+
+    public void replaceRoles(
+            Set<SecurityRole> roles
+    ) {
+
+        this.roles =
+                roles.isEmpty()
+                        ? EnumSet.noneOf(
+                        SecurityRole.class
+                )
+                        : EnumSet.copyOf(
+                        roles
+                );
+    }
+
+    public void enable() {
+
+        this.enabled = true;
+    }
+
+    public void disable() {
+
+        this.enabled = false;
+    }
+
+    public void changePasswordHash(
+            String passwordHash
+    ) {
+
+        this.passwordHash =
+                passwordHash;
+    }
 }
