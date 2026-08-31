@@ -1,5 +1,7 @@
 package com.rndymi.es.piscinapp.core.identity.application;
 
+import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
+import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
 import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
 import com.rndymi.es.piscinapp.core.identity.domain.UserAccount;
 import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
@@ -12,6 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -63,7 +68,7 @@ class UserAccountServiceTests {
                 );
 
         when(
-                repository.save(
+                repository.saveAndFlush(
                         any(UserAccount.class)
                 )
         )
@@ -87,7 +92,7 @@ class UserAccountServiceTests {
                         UserAccount.class
                 );
 
-        verify(repository).save(
+        verify(repository).saveAndFlush(
                 captor.capture()
         );
 
@@ -235,7 +240,7 @@ class UserAccountServiceTests {
                         )
         )
                 .isInstanceOf(
-                        IllegalStateException.class
+                        UsernameConflictException.class
                 )
                 .hasMessage(
                         "Username already exists"
@@ -247,6 +252,179 @@ class UserAccountServiceTests {
         )
                 .encode(
                         any()
+                );
+    }
+
+    @Test
+    void shouldRejectDisablingLastEnabledAdmin() {
+
+        UUID id =
+                UUID.randomUUID();
+
+        UserAccount admin =
+                new UserAccount(
+                        id,
+                        "last.admin",
+                        "{bcrypt}password",
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER,
+                                SecurityRole.ADMIN
+                        )
+                );
+
+        when(
+                repository.findWithRolesById(
+                        id
+                )
+        )
+                .thenReturn(
+                        Optional.of(
+                                admin
+                        )
+                );
+
+        when(
+                repository
+                        .findEnabledAccountsByRoleForUpdate(
+                                SecurityRole.ADMIN
+                        )
+        )
+                .thenReturn(
+                        List.of(
+                                admin
+                        )
+                );
+
+        assertThatThrownBy(
+                () ->
+                        service.updateStatus(
+                                id,
+                                false
+                        )
+        )
+                .isInstanceOf(
+                        LastAdminConflictException.class
+                );
+    }
+
+    @Test
+    void shouldAllowDisablingAdminWhenAnotherEnabledAdminExists() {
+
+        UUID targetId =
+                UUID.randomUUID();
+
+        UserAccount target =
+                new UserAccount(
+                        targetId,
+                        "first.admin",
+                        "{bcrypt}password",
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER,
+                                SecurityRole.ADMIN
+                        )
+                );
+
+        UserAccount another =
+                new UserAccount(
+                        UUID.randomUUID(),
+                        "second.admin",
+                        "{bcrypt}password",
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER,
+                                SecurityRole.ADMIN
+                        )
+                );
+
+        when(
+                repository.findWithRolesById(
+                        targetId
+                )
+        )
+                .thenReturn(
+                        Optional.of(
+                                target
+                        )
+                );
+
+        when(
+                repository
+                        .findEnabledAccountsByRoleForUpdate(
+                                SecurityRole.ADMIN
+                        )
+        )
+                .thenReturn(
+                        List.of(
+                                target,
+                                another
+                        )
+                );
+
+        UserAccount updated =
+                service.updateStatus(
+                        targetId,
+                        false
+                );
+
+        assertThat(
+                updated.isEnabled()
+        )
+                .isFalse();
+    }
+
+    @Test
+    void shouldEnsureAdminAlsoContainsUserRole() {
+
+        when(
+                repository.existsByUsername(
+                        "admin.only"
+                )
+        )
+                .thenReturn(
+                        false
+                );
+
+        when(
+                passwordEncoder.encode(
+                        "test-password-123"
+                )
+        )
+                .thenReturn(
+                        "{bcrypt}encoded"
+                );
+
+        when(
+                repository.saveAndFlush(
+                        any(
+                                UserAccount.class
+                        )
+                )
+        )
+                .thenAnswer(
+                        invocation ->
+                                invocation.getArgument(
+                                        0
+                                )
+                );
+
+        UserAccount account =
+                service.createAccount(
+                        "admin.only",
+                        "test-password-123",
+                        true,
+                        EnumSet.of(
+                                SecurityRole.ADMIN
+                        )
+                );
+
+        assertThat(
+                account.getRoles()
+        )
+                .containsExactlyInAnyOrder(
+                        SecurityRole.USER,
+                        SecurityRole.ADMIN
                 );
     }
 }

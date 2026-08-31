@@ -16,25 +16,32 @@ public class ResourceServerConfiguration {
 
     @Bean
     @Order(3)
-    SecurityFilterChain resourceServerSecurityFilterChain(
+    SecurityFilterChain
+    resourceServerSecurityFilterChain(
             HttpSecurity http,
             JwtAuthenticationConverter
-                    jwtAuthenticationConverter
+                    jwtAuthenticationConverter,
+            ApiAuthenticationEntryPoint
+                    apiAuthenticationEntryPoint,
+            ApiAccessDeniedHandler
+                    apiAccessDeniedHandler
     ) {
 
         return http
                 .csrf(
                         csrf ->
-                                csrf.ignoringRequestMatchers(
-                                        "/api/**"
-                                )
+                                csrf
+                                        .ignoringRequestMatchers(
+                                                "/api/**"
+                                        )
                 )
                 .sessionManagement(
                         session ->
-                                session.sessionCreationPolicy(
-                                        SessionCreationPolicy
-                                                .STATELESS
-                                )
+                                session
+                                        .sessionCreationPolicy(
+                                                SessionCreationPolicy
+                                                        .STATELESS
+                                        )
                 )
                 .authorizeHttpRequests(
                         authorize ->
@@ -47,24 +54,38 @@ public class ResourceServerConfiguration {
                                         )
                                         .permitAll()
                                         .requestMatchers(
-                                                "/api/security-test/admin"
+                                                "/api/v1/users/**"
                                         )
-                                        .hasRole("ADMIN")
+                                        .hasRole(
+                                                "ADMIN"
+                                        )
                                         .requestMatchers(
-                                                "/api/security-test/user"
+                                                "/api/v1/**"
                                         )
-                                        .hasRole("USER")
+                                        .authenticated()
                                         .anyRequest()
                                         .authenticated()
                 )
+                .exceptionHandling(
+                        exceptions ->
+                                exceptions
+                                        .accessDeniedHandler(
+                                                apiAccessDeniedHandler
+                                        )
+                )
                 .oauth2ResourceServer(
                         resourceServer ->
-                                resourceServer.jwt(
-                                        jwt ->
-                                                jwt.jwtAuthenticationConverter(
-                                                        jwtAuthenticationConverter
-                                                )
-                                )
+                                resourceServer
+                                        .authenticationEntryPoint(
+                                                apiAuthenticationEntryPoint
+                                        )
+                                        .jwt(
+                                                jwt ->
+                                                        jwt
+                                                                .jwtAuthenticationConverter(
+                                                                        jwtAuthenticationConverter
+                                                                )
+                                        )
                 )
                 .httpBasic(
                         AbstractHttpConfigurer::disable
@@ -82,9 +103,10 @@ public class ResourceServerConfiguration {
         JwtAuthenticationConverter converter =
                 new JwtAuthenticationConverter();
 
-        converter.setJwtGrantedAuthoritiesConverter(
-                new JwtRoleAuthoritiesConverter()
-        );
+        converter
+                .setJwtGrantedAuthoritiesConverter(
+                        new JwtRoleAuthoritiesConverter()
+                );
 
         return converter;
     }
