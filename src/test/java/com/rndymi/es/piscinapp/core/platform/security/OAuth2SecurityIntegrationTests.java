@@ -643,7 +643,7 @@ class OAuth2SecurityIntegrationTests {
 
         mockMvc.perform(
                         get(
-                                "/api/security-test/user"
+                                "/api/v1/me"
                         )
                                 .header(
                                         "Authorization",
@@ -653,6 +653,14 @@ class OAuth2SecurityIntegrationTests {
                 )
                 .andExpect(
                         status().isUnauthorized()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.code"
+                        )
+                                .value(
+                                        "AUTHENTICATION_REQUIRED"
+                                )
                 );
     }
 
@@ -674,7 +682,7 @@ class OAuth2SecurityIntegrationTests {
 
         mockMvc.perform(
                         get(
-                                "/api/security-test/user"
+                                "/api/v1/me"
                         )
                                 .header(
                                         "Authorization",
@@ -684,6 +692,14 @@ class OAuth2SecurityIntegrationTests {
                 )
                 .andExpect(
                         status().isUnauthorized()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.code"
+                        )
+                                .value(
+                                        "AUTHENTICATION_REQUIRED"
+                                )
                 );
     }
 
