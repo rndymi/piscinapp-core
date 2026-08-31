@@ -59,11 +59,11 @@ jobs:
         run: ./mvnw -B verify
 
       - name: Analyze with SonarCloud
+        if: github.ref == 'refs/heads/develop'
         env:
           SONAR_PISCINAPP_CORE_TOKEN: ${{ secrets.SONAR_PISCINAPP_CORE_TOKEN }}
           SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
           SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
-
         run: >
           ./mvnw -B sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
