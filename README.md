@@ -147,7 +147,7 @@ These variables are intended for production-shaped runtime configuration or expl
 
 Real production credentials must never be committed to the repository.
 
-OAuth2/OIDC client authentication, role-aware JWT behavior and account-administration REST APIs belong to later v1.0.0 HUs.
+PiscinApp Core currently provides persistent security accounts, OAuth2/OpenID Connect authentication, role-aware JWT authorization and the versioned `/api/v1` Identity and Access Management API.
 
 ---
 
@@ -191,7 +191,29 @@ Swagger UI and OpenAPI documentation remain disabled under the prod profile.
 
 Final OAuth2 client registrations for piscinapp-control and piscinapp-field are not defined yet. They will be introduced when those clients have real redirect and deployment contracts.
 
-Account-management REST APIs are also outside this stage and belong to the next Identity and Access Management HU.
+---
+
+### Identity API
+
+The first functional Core API is exposed under:
+
+* `/api/v1/me`
+* `/api/v1/users`
+
+Authenticated users can inspect their current security account and change
+their own password.
+
+Account creation, listing, role management, status management and
+administrator password replacement require the `ADMIN` role.
+
+The API uses OAuth2 Bearer access tokens and machine-readable
+`ProblemDetail` error responses.
+
+Password values and password hashes are never returned by the API.
+
+Account role, status and password changes do not immediately revoke
+already-issued JWT access tokens. Existing tokens remain subject to
+their configured lifetime.
 
 ---
 
