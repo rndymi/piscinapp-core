@@ -151,21 +151,9 @@ public class UserAccountService {
             String principalName
     ) {
 
-        String username =
-                validateAndNormalizeUsername(
-                        principalName
-                );
-
-        return userAccountRepository
-                .findByUsername(
-                        username
-                )
-                .orElseThrow(
-                        () ->
-                                new UserAccountNotFoundException(
-                                        username
-                                )
-                );
+        return findByPrincipalName(
+                principalName
+        );
     }
 
     @Transactional
@@ -248,7 +236,7 @@ public class UserAccountService {
     ) {
 
         UserAccount account =
-                getCurrentAccountForUpdate(
+                findByPrincipalName(
                         principalName
                 );
 
@@ -313,8 +301,7 @@ public class UserAccountService {
                 );
     }
 
-    private UserAccount
-    getCurrentAccountForUpdate(
+    private UserAccount findByPrincipalName(
             String principalName
     ) {
 

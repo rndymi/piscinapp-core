@@ -34,13 +34,9 @@ public class JwtRoleAuthoritiesConverter
                 scopeAuthoritiesConverter.convert(
                         jwt
                 );
-
-        if (scopeAuthorities != null) {
-
-            authorities.addAll(
-                    scopeAuthorities
-            );
-        }
+        authorities.addAll(
+                scopeAuthorities
+        );
 
         Object rolesClaim =
                 jwt.getClaim("roles");
