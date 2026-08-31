@@ -16,6 +16,7 @@ public class ResourceServerConfiguration {
 
     @Bean
     @Order(3)
+    @SuppressWarnings("java:S4502")
     SecurityFilterChain
     resourceServerSecurityFilterChain(
             HttpSecurity http,

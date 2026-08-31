@@ -102,9 +102,8 @@ class OAuth2SecurityIntegrationTests {
 
         assertThat(
                 jwt.getIssuer()
-                        .toString()
         )
-                .isEqualTo(
+                .hasToString(
                         "http://localhost:8080"
                 );
 
