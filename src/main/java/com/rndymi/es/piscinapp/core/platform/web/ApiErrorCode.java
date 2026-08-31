@@ -1,0 +1,18 @@
+package com.rndymi.es.piscinapp.core.platform.web;
+
+public enum ApiErrorCode {
+
+    VALIDATION_ERROR,
+
+    IDENTITY_USER_NOT_FOUND,
+
+    IDENTITY_USERNAME_CONFLICT,
+
+    IDENTITY_INVALID_CURRENT_PASSWORD,
+
+    IDENTITY_LAST_ADMIN_CONFLICT,
+
+    ACCESS_DENIED,
+
+    AUTHENTICATION_REQUIRED
+}
