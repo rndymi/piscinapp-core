@@ -37,8 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -183,7 +182,7 @@ class OAuth2SecurityIntegrationTests {
 
         mockMvc.perform(
                         get(
-                                "/api/security-test/user"
+                                "/api/v1/me"
                         )
                                 .header(
                                         "Authorization",
@@ -197,7 +196,7 @@ class OAuth2SecurityIntegrationTests {
 
         mockMvc.perform(
                         get(
-                                "/api/security-test/admin"
+                                "/api/v1/users"
                         )
                                 .header(
                                         "Authorization",
@@ -231,7 +230,7 @@ class OAuth2SecurityIntegrationTests {
 
         mockMvc.perform(
                         get(
-                                "/api/security-test/admin"
+                                "/api/v1/users"
                         )
                                 .header(
                                         "Authorization",
@@ -250,7 +249,7 @@ class OAuth2SecurityIntegrationTests {
 
         mockMvc.perform(
                         get(
-                                "/api/security-test/user"
+                                "/api/v1/me"
                         )
                 )
                 .andExpect(
@@ -261,6 +260,14 @@ class OAuth2SecurityIntegrationTests {
                                 "WWW-Authenticate",
                                 startsWith("Bearer")
                         )
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.code"
+                        )
+                                .value(
+                                        "AUTHENTICATION_REQUIRED"
+                                )
                 );
     }
 
@@ -289,7 +296,7 @@ class OAuth2SecurityIntegrationTests {
 
         mockMvc.perform(
                         get(
-                                "/api/security-test/user"
+                                "/api/v1/me"
                         )
                                 .header(
                                         "Authorization",

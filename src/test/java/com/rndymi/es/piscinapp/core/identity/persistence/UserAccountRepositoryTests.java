@@ -168,4 +168,97 @@ class UserAccountRepositoryTests {
                         DataIntegrityViolationException.class
                 );
     }
+
+    @Test
+    void shouldFindAccountsOrderedByUsername() {
+
+        repository.saveAllAndFlush(
+                List.of(
+                        new UserAccount(
+                                UUID.randomUUID(),
+                                "zeta.user",
+                                "{noop}password-value",
+                                true,
+                                EnumSet.of(
+                                        SecurityRole.USER
+                                )
+                        ),
+                        new UserAccount(
+                                UUID.randomUUID(),
+                                "alpha.user",
+                                "{noop}password-value",
+                                true,
+                                EnumSet.of(
+                                        SecurityRole.USER
+                                )
+                        )
+                )
+        );
+
+        List<UserAccount> accounts =
+                repository
+                        .findAllByOrderByUsernameAsc();
+
+        assertThat(
+                accounts
+                        .stream()
+                        .map(
+                                UserAccount::getUsername
+                        )
+                        .toList()
+        )
+                .containsSubsequence(
+                        "alpha.user",
+                        "zeta.user"
+                );
+    }
+
+    @Test
+    void shouldFindEnabledAdministratorsForUpdate() {
+
+        UserAccount enabledAdmin =
+                repository.saveAndFlush(
+                        new UserAccount(
+                                UUID.randomUUID(),
+                                "enabled.admin",
+                                "{noop}password-value",
+                                true,
+                                EnumSet.of(
+                                        SecurityRole.USER,
+                                        SecurityRole.ADMIN
+                                )
+                        )
+                );
+
+        repository.saveAndFlush(
+                new UserAccount(
+                        UUID.randomUUID(),
+                        "disabled.admin",
+                        "{noop}password-value",
+                        false,
+                        EnumSet.of(
+                                SecurityRole.USER,
+                                SecurityRole.ADMIN
+                        )
+                )
+        );
+
+        List<UserAccount> administrators =
+                repository
+                        .findEnabledAccountsByRoleForUpdate(
+                                SecurityRole.ADMIN
+                        );
+
+        assertThat(
+                administrators
+                        .stream()
+                        .map(
+                                UserAccount::getId
+                        )
+                        .toList()
+        )
+                .contains(
+                        enabledAdmin.getId()
+                );
+    }
 }
