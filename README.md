@@ -2,7 +2,9 @@
 
 Backend service of the PiscinApp ecosystem.
 
-Current bootstrap version: `v1.0.0`.
+Latest stable version: `v1.0.0`.
+
+Current development version: `v1.1.0-SNAPSHOT`.
 
 ---
 
@@ -286,4 +288,6 @@ FAKE_PROD validates the production-shaped Core container, PostgreSQL connectivit
 mvn clean package
 ```
 
-The project currently contains the Core transversal platform and the persistent PiscinApp identity foundation. OAuth2/OIDC client authentication, account administration and functional business APIs belong to later HUs and versions.
+The project currently contains the Core transversal platform and the first stable PiscinApp Identity and Access Management capability.
+
+Future business modules and definitive OAuth2 client integrations for `piscinapp-control` and `piscinapp-field` will evolve in subsequent versions as their real integration contracts are defined.
