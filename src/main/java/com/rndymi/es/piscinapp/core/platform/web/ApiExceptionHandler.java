@@ -1,5 +1,9 @@
 package com.rndymi.es.piscinapp.core.platform.web;
 
+import com.rndymi.es.piscinapp.core.crews.application.exception.CrewMemberNotFoundException;
+import com.rndymi.es.piscinapp.core.crews.application.exception.CrewMembershipConflictException;
+import com.rndymi.es.piscinapp.core.crews.application.exception.CrewNotFoundException;
+import com.rndymi.es.piscinapp.core.crews.application.exception.CrewSupervisorConflictException;
 import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeAccountConflictException;
 import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurrentPasswordException;
@@ -192,6 +196,74 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .RESOURCE_INACTIVE,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            CrewNotFoundException.class
+    )
+    ProblemDetail handleCrewNotFound(
+            CrewNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .CREW_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            CrewMemberNotFoundException.class
+    )
+    ProblemDetail handleCrewMemberNotFound(
+            CrewMemberNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .CREW_MEMBER_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            CrewMembershipConflictException.class
+    )
+    ProblemDetail handleCrewMembershipConflict(
+            CrewMembershipConflictException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .CREW_MEMBERSHIP_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            CrewSupervisorConflictException.class
+    )
+    ProblemDetail handleCrewSupervisorConflict(
+            CrewSupervisorConflictException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .CREW_SUPERVISOR_CONFLICT,
                 request
         );
     }
