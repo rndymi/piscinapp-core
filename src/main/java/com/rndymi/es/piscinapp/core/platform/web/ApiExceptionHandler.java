@@ -10,6 +10,11 @@ import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurren
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivityNotApplicableException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitCrewNotAssignableException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitInvalidScheduleException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitNotFoundException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitStateConflictException;
 import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
 import com.rndymi.es.piscinapp.core.maintenance.application.exception.MaintenanceActivityNotFoundException;
 import com.rndymi.es.piscinapp.core.maintenance.application.exception.PoolMaintenanceActivityConflictException;
@@ -264,6 +269,91 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .CREW_SUPERVISOR_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitNotFoundException.class
+    )
+    ProblemDetail handleVisitNotFound(
+            VisitNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitStateConflictException.class
+    )
+    ProblemDetail handleVisitStateConflict(
+            VisitStateConflictException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_STATE_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitCrewNotAssignableException.class
+    )
+    ProblemDetail handleVisitCrewNotAssignable(
+            VisitCrewNotAssignableException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_CREW_NOT_ASSIGNABLE,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitActivityNotApplicableException.class
+    )
+    ProblemDetail handleVisitActivityNotApplicable(
+            VisitActivityNotApplicableException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_ACTIVITY_NOT_APPLICABLE,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitInvalidScheduleException.class
+    )
+    ProblemDetail handleVisitInvalidSchedule(
+            VisitInvalidScheduleException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_INVALID_SCHEDULE,
                 request
         );
     }
