@@ -118,15 +118,18 @@ class MaintenanceRepositoryTests {
                         )
                 );
 
+        PoolMaintenanceActivity duplicatedConfiguration =
+                new PoolMaintenanceActivity(
+                        UUID.randomUUID(),
+                        poolId,
+                        activityId
+                );
+
         assertThatThrownBy(
                 () ->
                         configurationRepository
                                 .saveAndFlush(
-                                        new PoolMaintenanceActivity(
-                                                UUID.randomUUID(),
-                                                poolId,
-                                                activityId
-                                        )
+                                        duplicatedConfiguration
                                 )
         )
                 .isInstanceOf(

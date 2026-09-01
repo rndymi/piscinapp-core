@@ -1,5 +1,6 @@
 package com.rndymi.es.piscinapp.core.employees.api;
 
+import com.rndymi.es.piscinapp.core.platform.web.PageRequestFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +17,13 @@ class EmployeePageRequestFactoryTests {
     @BeforeEach
     void setUp() {
 
+        PageRequestFactory pageRequestFactory =
+                new PageRequestFactory();
+
         factory =
-                new EmployeePageRequestFactory();
+                new EmployeePageRequestFactory(
+                        pageRequestFactory
+                );
     }
 
     @Test
