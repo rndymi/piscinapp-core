@@ -219,6 +219,31 @@ their configured lifetime.
 
 ---
 
+### Employee API
+
+The `v1.1.0` development line introduces operational employee management.
+
+Employees are independent from security accounts and contain:
+
+- a stable employee UUID;
+- first name and family name;
+- active/inactive operational state;
+- an optional associated security-account UUID.
+
+Employee administration is exposed under:
+
+* `/api/v1/employees`
+
+Employee administration requires the `ADMIN` role.
+
+The employee collection supports bounded pagination, active-state filtering, case-insensitive name search and controlled sorting.
+
+An employee may optionally be associated with an existing PiscinApp security account. Employee lifecycle and account lifecycle remain independent.
+
+Normal employee hard deletion is not exposed.
+
+---
+
 ### Tests
 
 With PostgreSQL running:
