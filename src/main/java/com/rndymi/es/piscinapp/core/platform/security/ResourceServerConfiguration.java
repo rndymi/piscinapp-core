@@ -59,7 +59,8 @@ public class ResourceServerConfiguration {
                                                 "/api/v1/employees/**",
                                                 "/api/v1/pools/**",
                                                 "/api/v1/maintenance-activities/**",
-                                                "/api/v1/crews/**"
+                                                "/api/v1/crews/**",
+                                                "/api/v1/visits/**"
                                         )
                                         .hasRole(
                                                 "ADMIN"
