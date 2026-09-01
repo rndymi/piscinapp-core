@@ -55,7 +55,8 @@ public class ResourceServerConfiguration {
                                         )
                                         .permitAll()
                                         .requestMatchers(
-                                                "/api/v1/users/**"
+                                                "/api/v1/users/**",
+                                                "/api/v1/employees/**"
                                         )
                                         .hasRole(
                                                 "ADMIN"
