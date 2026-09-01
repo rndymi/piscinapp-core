@@ -1,5 +1,7 @@
 package com.rndymi.es.piscinapp.core.platform.web;
 
+import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeAccountConflictException;
+import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurrentPasswordException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
@@ -84,6 +86,40 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .IDENTITY_LAST_ADMIN_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            EmployeeNotFoundException.class
+    )
+    ProblemDetail handleEmployeeNotFound(
+            EmployeeNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .EMPLOYEE_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            EmployeeAccountConflictException.class
+    )
+    ProblemDetail handleEmployeeAccountConflict(
+            EmployeeAccountConflictException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .EMPLOYEE_ACCOUNT_CONFLICT,
                 request
         );
     }
