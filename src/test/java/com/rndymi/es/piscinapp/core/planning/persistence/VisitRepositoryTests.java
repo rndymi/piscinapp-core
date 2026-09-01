@@ -4,13 +4,13 @@ import com.rndymi.es.piscinapp.core.planning.application.VisitSearchCriteria;
 import com.rndymi.es.piscinapp.core.planning.domain.Visit;
 import com.rndymi.es.piscinapp.core.planning.domain.VisitMaintenanceActivity;
 import com.rndymi.es.piscinapp.core.planning.domain.VisitStatus;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,7 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
-@DataJpaTest
+@SpringBootTest
+@Transactional
 class VisitRepositoryTests {
 
     @Autowired
@@ -30,16 +31,6 @@ class VisitRepositoryTests {
     @Autowired
     private VisitMaintenanceActivityRepository
             activityRepository;
-
-    @BeforeEach
-    void setUp() {
-
-        activityRepository
-                .deleteAll();
-
-        visitRepository
-                .deleteAll();
-    }
 
     @Test
     void shouldPersistVisitAndSelectedActivities() {
