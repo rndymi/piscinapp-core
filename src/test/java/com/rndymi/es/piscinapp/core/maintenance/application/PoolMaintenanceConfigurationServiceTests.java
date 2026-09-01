@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -92,12 +94,18 @@ class PoolMaintenanceConfigurationServiceTests {
                         activity.getId()
                 );
 
+        UUID poolId =
+                pool.getId();
+
+        UUID activityId =
+                activity.getId();
+
         assertThatThrownBy(
                 () ->
                         configurationService
                                 .configure(
-                                        pool.getId(),
-                                        activity.getId()
+                                        poolId,
+                                        activityId
                                 )
         )
                 .isInstanceOf(
@@ -128,12 +136,18 @@ class PoolMaintenanceConfigurationServiceTests {
                                 null
                         );
 
+        UUID poolId =
+                pool.getId();
+
+        UUID activityId =
+                activity.getId();
+
         assertThatThrownBy(
                 () ->
                         configurationService
                                 .configure(
-                                        pool.getId(),
-                                        activity.getId()
+                                        poolId,
+                                        activityId
                                 )
         )
                 .isInstanceOf(
@@ -164,12 +178,18 @@ class PoolMaintenanceConfigurationServiceTests {
                         false
                 );
 
+        UUID poolId =
+                pool.getId();
+
+        UUID activityId =
+                activity.getId();
+
         assertThatThrownBy(
                 () ->
                         configurationService
                                 .configure(
-                                        pool.getId(),
-                                        activity.getId()
+                                        poolId,
+                                        activityId
                                 )
         )
                 .isInstanceOf(

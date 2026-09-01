@@ -213,11 +213,14 @@ class EmployeeServiceTests {
                         true
                 );
 
+        UUID employeeId =
+                employee.getId();
+
         assertThatThrownBy(
                 () ->
                         employeeService
                                 .associateAccount(
-                                        employee.getId(),
+                                        employeeId,
                                         accountId
                                 )
         )
