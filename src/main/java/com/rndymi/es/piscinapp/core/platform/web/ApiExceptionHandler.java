@@ -6,7 +6,7 @@ import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurren
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
-import com.rndymi.es.piscinapp.core.maintenance.application.exception.InactiveResourceException;
+import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
 import com.rndymi.es.piscinapp.core.maintenance.application.exception.MaintenanceActivityNotFoundException;
 import com.rndymi.es.piscinapp.core.maintenance.application.exception.PoolMaintenanceActivityConflictException;
 import com.rndymi.es.piscinapp.core.pools.application.exception.PoolNotFoundException;
