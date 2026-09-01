@@ -1,4 +1,4 @@
-package com.rndymi.es.piscinapp.core.maintenance.application.exception;
+package com.rndymi.es.piscinapp.core.platform.application;
 
 import java.util.UUID;
 

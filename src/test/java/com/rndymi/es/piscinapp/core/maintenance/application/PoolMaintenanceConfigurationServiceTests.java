@@ -1,6 +1,6 @@
 package com.rndymi.es.piscinapp.core.maintenance.application;
 
-import com.rndymi.es.piscinapp.core.maintenance.application.exception.InactiveResourceException;
+import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
 import com.rndymi.es.piscinapp.core.maintenance.application.exception.PoolMaintenanceActivityConflictException;
 import com.rndymi.es.piscinapp.core.maintenance.domain.MaintenanceActivity;
 import com.rndymi.es.piscinapp.core.maintenance.persistence.PoolMaintenanceActivityRepository;

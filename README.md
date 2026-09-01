@@ -282,6 +282,32 @@ Deactivation preserves master data and existing applicability configuration. Nor
 
 ---
 
+### Crew organization API
+
+The `v1.1.0` development line provides operational crew organization.
+
+A crew contains:
+
+- a stable crew UUID;
+- an operational name;
+- active/inactive state;
+- employee membership;
+- one optional designated supervisor employee.
+
+Crew administration is exposed through:
+
+* `/api/v1/crews`
+
+Administrators can add and remove employee memberships and explicitly assign, change or clear the crew supervisor.
+
+Only active employees may be newly added to a crew or designated as supervisor. The supervisor must already belong to the same crew.
+
+Crew membership and supervisor responsibility are operational concepts and do not create or modify Spring Security roles.
+
+Crew deactivation preserves existing membership and supervisor configuration. Normal hard deletion of crews is not exposed.
+
+---
+
 ### Tests
 
 With PostgreSQL running:
