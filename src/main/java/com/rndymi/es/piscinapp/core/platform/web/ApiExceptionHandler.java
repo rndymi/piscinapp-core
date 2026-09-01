@@ -6,6 +6,10 @@ import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurren
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
+import com.rndymi.es.piscinapp.core.maintenance.application.exception.InactiveResourceException;
+import com.rndymi.es.piscinapp.core.maintenance.application.exception.MaintenanceActivityNotFoundException;
+import com.rndymi.es.piscinapp.core.maintenance.application.exception.PoolMaintenanceActivityConflictException;
+import com.rndymi.es.piscinapp.core.pools.application.exception.PoolNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -120,6 +124,74 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .EMPLOYEE_ACCOUNT_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            PoolNotFoundException.class
+    )
+    ProblemDetail handlePoolNotFound(
+            PoolNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .POOL_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            MaintenanceActivityNotFoundException.class
+    )
+    ProblemDetail handleMaintenanceActivityNotFound(
+            MaintenanceActivityNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .MAINTENANCE_ACTIVITY_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            PoolMaintenanceActivityConflictException.class
+    )
+    ProblemDetail handlePoolMaintenanceActivityConflict(
+            PoolMaintenanceActivityConflictException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .POOL_MAINTENANCE_ACTIVITY_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            InactiveResourceException.class
+    )
+    ProblemDetail handleInactiveResource(
+            InactiveResourceException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .RESOURCE_INACTIVE,
                 request
         );
     }

@@ -244,6 +244,44 @@ Normal employee hard deletion is not exposed.
 
 ---
 
+### Pool and maintenance configuration API
+
+The `v1.1.0` development line provides swimming-pool and maintenance-activity master-data configuration.
+
+Swimming pools contain:
+
+- a stable UUID;
+- an operational name;
+- an address;
+- active/inactive state.
+
+Pool administration is exposed under:
+
+* `/api/v1/pools`
+
+Maintenance activities are configurable persisted records containing:
+
+- a stable UUID;
+- a name;
+- an optional plain-text description;
+- active/inactive state.
+
+Maintenance-activity administration is exposed under:
+
+* `/api/v1/maintenance-activities`
+
+Administrators can configure which maintenance activities are applicable to each swimming pool through:
+
+* `/api/v1/pools/{poolId}/maintenance-activities`
+
+Pool, maintenance-activity and applicability administration requires the `ADMIN` role.
+
+Pool and maintenance-activity collections support bounded pagination, active-state filtering, case-insensitive search and controlled sorting.
+
+Deactivation preserves master data and existing applicability configuration. Normal hard deletion of swimming pools and maintenance activities is not exposed.
+
+---
+
 ### Tests
 
 With PostgreSQL running:
