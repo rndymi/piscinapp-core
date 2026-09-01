@@ -308,6 +308,41 @@ Crew deactivation preserves existing membership and supervisor configuration. No
 
 ---
 
+### Scheduled visit planning API
+
+The `v1.1.0` development line provides explicit operational visit planning.
+
+A planned visit contains:
+
+- a stable visit UUID;
+- one swimming-pool reference;
+- one assigned crew;
+- a planned date;
+- a planned time;
+- one or more selected maintenance activities;
+- a lifecycle state;
+- optional plain-text planning notes.
+
+Visit planning is exposed through:
+
+* `/api/v1/visits`
+
+Administrators can create, retrieve, search, update and cancel planned visits.
+
+New visits start in the `PLANNED` state.
+
+Planning validates that the swimming pool is active, the assigned crew is currently operationally assignable and every selected maintenance activity is active and applicable to the selected swimming pool.
+
+Planned visits can be updated only while they remain in the `PLANNED` state.
+
+Cancellation preserves the visit and its planned configuration. Normal hard deletion of visits is not exposed.
+
+The visit collection supports bounded pagination, exact-date and inclusive date-range filtering, lifecycle-state filtering, pool and crew filtering, and controlled sorting.
+
+Visit execution, activity completion, observations and incidents are not implemented by the current planning capability.
+
+---
+
 ### Tests
 
 With PostgreSQL running:
