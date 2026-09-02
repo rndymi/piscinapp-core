@@ -182,18 +182,6 @@ public class DataSeederDev
 
     private void resetOperationalData() {
 
-        /*
-         * Bulk deletes are intentional here.
-         *
-         * The DEV seeder recreates the canonical dataset with the same
-         * deterministic UUIDs during the same startup transaction.
-         * Using deleteAllInBatch() avoids loading deleted entities into
-         * the persistence context before those identifiers are inserted again.
-         *
-         * The order follows the current operational dependency graph:
-         * visit selections -> visits -> pool configuration ->
-         * crew memberships -> crews -> employees/activities/pools.
-         */
         visitMaintenanceActivityRepository
                 .deleteAllInBatch();
 

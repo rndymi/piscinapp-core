@@ -8,6 +8,8 @@ import com.rndymi.es.piscinapp.core.planning.application.VisitService;
 import com.rndymi.es.piscinapp.core.planning.domain.Visit;
 import com.rndymi.es.piscinapp.core.planning.domain.VisitStatus;
 import com.rndymi.es.piscinapp.core.platform.web.PageResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -57,6 +59,32 @@ public class VisitController {
             summary =
                     "Create a planned visit"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Planned visit created"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request or malformed input"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Referenced pool, crew, employee or maintenance activity not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Referenced resource inactive, crew not assignable, activity not applicable or invalid schedule"
+            )
+    })
     public ResponseEntity<VisitResponse>
     createVisit(
             @Valid
@@ -99,6 +127,28 @@ public class VisitController {
             summary =
                     "Return one planned visit"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Planned visit returned"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Malformed visit identifier"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Visit not found"
+            )
+    })
     public VisitResponse getVisit(
             @PathVariable
             UUID id
@@ -117,6 +167,24 @@ public class VisitController {
             summary =
                     "Search scheduled visits"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Scheduled visits returned"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid filters, pagination or sorting"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            )
+    })
     public PageResponse<VisitResponse>
     listVisits(
             @RequestParam(
@@ -219,6 +287,32 @@ public class VisitController {
             summary =
                     "Update a planned visit"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Planned visit updated"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request or malformed input"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Visit or referenced resource not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Visit state conflict or planning rules not satisfied"
+            )
+    })
     public VisitResponse updateVisit(
             @PathVariable
             UUID id,
@@ -248,6 +342,32 @@ public class VisitController {
             summary =
                     "Cancel a planned visit"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Planned visit cancelled"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Malformed visit identifier"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Visit not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Visit cannot be cancelled from its current state"
+            )
+    })
     public VisitResponse cancelVisit(
             @PathVariable
             UUID id

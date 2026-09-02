@@ -1340,6 +1340,83 @@ class VisitApiIntegrationTests {
     }
 
     @Test
+    void shouldRejectSupervisorOutsideCrewMembers()
+            throws Exception {
+
+        SwimmingPool pool =
+                swimmingPoolService
+                        .createPool(
+                                "Central Pool",
+                                "1 Main Street"
+                        );
+
+        MaintenanceActivity activity =
+                maintenanceActivityService
+                        .createActivity(
+                                "Filter inspection",
+                                "Check filter condition"
+                        );
+
+        configurationService
+                .configure(
+                        pool.getId(),
+                        activity.getId()
+                );
+
+        Crew crew =
+                crewService
+                        .createCrew(
+                                "Morning Crew"
+                        );
+
+        Employee member =
+                employeeService
+                        .createEmployee(
+                                "Carlos",
+                                "Lopez"
+                        );
+
+        Employee outsideSupervisor =
+                employeeService
+                        .createEmployee(
+                                "Ana",
+                                "Martinez"
+                        );
+
+        crewService
+                .addMember(
+                        crew.getId(),
+                        member.getId()
+                );
+
+        crew.assignSupervisor(
+                outsideSupervisor.getId()
+        );
+
+        crewRepository
+                .saveAndFlush(
+                        crew
+                );
+
+        performCreate(
+                pool.getId(),
+                crew.getId(),
+                activity.getId()
+        )
+                .andExpect(
+                        status().isConflict()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.code"
+                        )
+                                .value(
+                                        "VISIT_CREW_NOT_ASSIGNABLE"
+                                )
+                );
+    }
+
+    @Test
     void shouldRejectInactiveCrewMember()
             throws Exception {
 

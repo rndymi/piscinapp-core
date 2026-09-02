@@ -44,7 +44,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class DevelopmentDataSeederTests {
+class DataSeederDevTests {
 
     private static final Clock FIXED_CLOCK =
             Clock.fixed(
@@ -169,10 +169,6 @@ class DevelopmentDataSeederTests {
                 )
                 .deleteAllInBatch();
 
-        /*
-         * The first seed write must occur only after every operational
-         * reset operation has completed.
-         */
         order.verify(
                         swimmingPoolRepository
                 )
