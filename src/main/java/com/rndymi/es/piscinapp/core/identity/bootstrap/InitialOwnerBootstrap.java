@@ -1,16 +1,15 @@
 package com.rndymi.es.piscinapp.core.identity.bootstrap;
 
 import com.rndymi.es.piscinapp.core.identity.application.UserAccountService;
-import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
 import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.EnumSet;
-
 @Component
-public class InitialAdminBootstrap
+@Order(0)
+public class InitialOwnerBootstrap
         implements ApplicationRunner {
 
     private final UserAccountRepository
@@ -19,13 +18,13 @@ public class InitialAdminBootstrap
     private final UserAccountService
             userAccountService;
 
-    private final BootstrapAdminProperties
+    private final BootstrapOwnerProperties
             properties;
 
-    public InitialAdminBootstrap(
+    public InitialOwnerBootstrap(
             UserAccountRepository userAccountRepository,
             UserAccountService userAccountService,
-            BootstrapAdminProperties properties
+            BootstrapOwnerProperties properties
     ) {
 
         this.userAccountRepository =
@@ -44,9 +43,8 @@ public class InitialAdminBootstrap
     ) {
 
         if (
-                userAccountRepository.existsByRole(
-                        SecurityRole.ADMIN
-                )
+                userAccountRepository
+                        .existsByOwnerTrue()
         ) {
 
             return;
@@ -54,22 +52,18 @@ public class InitialAdminBootstrap
 
         try {
 
-            userAccountService.createAccount(
-                    properties.getUsername(),
-                    properties.getPassword(),
-                    true,
-                    EnumSet.of(
-                            SecurityRole.USER,
-                            SecurityRole.ADMIN
-                    )
-            );
+            userAccountService
+                    .createOwnerAccount(
+                            properties.getUsername(),
+                            properties.getPassword()
+                    );
 
         } catch (
-                IllegalArgumentException exception
+                RuntimeException exception
         ) {
 
             throw new IllegalStateException(
-                    "Valid bootstrap administrator credentials are required when no administrator exists",
+                    "Valid bootstrap Owner credentials are required when no protected Owner exists",
                     exception
             );
         }

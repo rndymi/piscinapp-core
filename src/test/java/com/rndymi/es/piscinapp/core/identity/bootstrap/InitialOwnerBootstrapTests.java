@@ -17,15 +17,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
 
-class InitialAdminBootstrapTests {
+class InitialOwnerBootstrapTests {
 
     private UserAccountRepository repository;
 
     private UserAccountService accountService;
 
-    private BootstrapAdminProperties properties;
+    private BootstrapOwnerProperties properties;
 
-    private InitialAdminBootstrap bootstrap;
+    private InitialOwnerBootstrap bootstrap;
 
     @BeforeEach
     void setUp() {
@@ -41,7 +41,7 @@ class InitialAdminBootstrapTests {
                 );
 
         properties =
-                new BootstrapAdminProperties();
+                new BootstrapOwnerProperties();
 
         properties.setUsername(
                 "  Bootstrap.Admin  "
@@ -52,7 +52,7 @@ class InitialAdminBootstrapTests {
         );
 
         bootstrap =
-                new InitialAdminBootstrap(
+                new InitialOwnerBootstrap(
                         repository,
                         accountService,
                         properties

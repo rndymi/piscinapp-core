@@ -5,30 +5,34 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(
-        prefix = "piscinapp.bootstrap.admin"
+        prefix = "piscinapp.bootstrap.owner"
 )
-public class BootstrapAdminProperties {
+public class BootstrapOwnerProperties {
 
     private String username;
     private String password;
 
     public String getUsername() {
+
         return username;
     }
 
     public void setUsername(
             String username
     ) {
+
         this.username = username;
     }
 
     public String getPassword() {
+
         return password;
     }
 
     public void setPassword(
             String password
     ) {
+
         this.password = password;
     }
 }
