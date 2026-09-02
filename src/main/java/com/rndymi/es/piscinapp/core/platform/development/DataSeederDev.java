@@ -6,6 +6,9 @@ import com.rndymi.es.piscinapp.core.crews.persistence.CrewMembershipRepository;
 import com.rndymi.es.piscinapp.core.crews.persistence.CrewRepository;
 import com.rndymi.es.piscinapp.core.employees.domain.Employee;
 import com.rndymi.es.piscinapp.core.employees.persistence.EmployeeRepository;
+import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
+import com.rndymi.es.piscinapp.core.identity.domain.UserAccount;
+import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
 import com.rndymi.es.piscinapp.core.maintenance.domain.MaintenanceActivity;
 import com.rndymi.es.piscinapp.core.maintenance.domain.PoolMaintenanceActivity;
 import com.rndymi.es.piscinapp.core.maintenance.persistence.MaintenanceActivityRepository;
@@ -19,19 +22,45 @@ import com.rndymi.es.piscinapp.core.pools.persistence.SwimmingPoolRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
 @Component
 @Profile("dev")
+@Order(100)
 public class DataSeederDev
         implements ApplicationRunner {
+
+    static final UUID DEV_ADMIN_ACCOUNT_ID =
+            UUID.fromString(
+                    "00000000-0000-0000-0000-000000000101"
+            );
+
+    static final UUID DEV_USER_ACCOUNT_ID =
+            UUID.fromString(
+                    "00000000-0000-0000-0000-000000000102"
+            );
+
+    static final String DEV_ADMIN_USERNAME =
+            "dev.admin";
+
+    static final String DEV_ADMIN_PASSWORD =
+            "dev-admin-password";
+
+    static final String DEV_USER_USERNAME =
+            "dev.user";
+
+    static final String DEV_USER_PASSWORD =
+            "dev-user-password";
 
     static final UUID POOL_CENTRAL_ID =
             UUID.fromString(
@@ -103,6 +132,12 @@ public class DataSeederDev
                     "50000000-0000-0000-0000-000000000002"
             );
 
+    private final UserAccountRepository
+            userAccountRepository;
+
+    private final PasswordEncoder
+            passwordEncoder;
+
     private final VisitMaintenanceActivityRepository
             visitMaintenanceActivityRepository;
 
@@ -131,6 +166,8 @@ public class DataSeederDev
             clock;
 
     public DataSeederDev(
+            UserAccountRepository userAccountRepository,
+            PasswordEncoder passwordEncoder,
             VisitMaintenanceActivityRepository visitMaintenanceActivityRepository,
             VisitRepository visitRepository,
             PoolMaintenanceActivityRepository poolMaintenanceActivityRepository,
@@ -141,6 +178,12 @@ public class DataSeederDev
             SwimmingPoolRepository swimmingPoolRepository,
             Clock clock
     ) {
+
+        this.userAccountRepository =
+                userAccountRepository;
+
+        this.passwordEncoder =
+                passwordEncoder;
 
         this.visitMaintenanceActivityRepository =
                 visitMaintenanceActivityRepository;
@@ -176,11 +219,12 @@ public class DataSeederDev
             ApplicationArguments args
     ) {
 
-        resetOperationalData();
+        resetDisposableDevData();
+        seedDevAccounts();
         seedOperationalData();
     }
 
-    private void resetOperationalData() {
+    private void resetDisposableDevData() {
 
         visitMaintenanceActivityRepository
                 .deleteAllInBatch();
@@ -200,11 +244,64 @@ public class DataSeederDev
         employeeRepository
                 .deleteAllInBatch();
 
+        List<UserAccount> disposableAccounts =
+                userAccountRepository
+                        .findAllByOwnerFalse();
+
+        userAccountRepository
+                .deleteAll(
+                        disposableAccounts
+                );
+
+        userAccountRepository
+                .flush();
+
         maintenanceActivityRepository
                 .deleteAllInBatch();
 
         swimmingPoolRepository
                 .deleteAllInBatch();
+    }
+
+    private void seedDevAccounts() {
+
+        UserAccount admin =
+                new UserAccount(
+                        DEV_ADMIN_ACCOUNT_ID,
+                        DEV_ADMIN_USERNAME,
+                        passwordEncoder.encode(
+                                DEV_ADMIN_PASSWORD
+                        ),
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER,
+                                SecurityRole.ADMIN
+                        )
+                );
+
+        UserAccount user =
+                new UserAccount(
+                        DEV_USER_ACCOUNT_ID,
+                        DEV_USER_USERNAME,
+                        passwordEncoder.encode(
+                                DEV_USER_PASSWORD
+                        ),
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER
+                        )
+                );
+
+        userAccountRepository
+                .saveAll(
+                        List.of(
+                                admin,
+                                user
+                        )
+                );
+
+        userAccountRepository
+                .flush();
     }
 
     private void seedOperationalData() {
