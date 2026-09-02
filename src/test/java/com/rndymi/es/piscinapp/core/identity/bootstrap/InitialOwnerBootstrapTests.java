@@ -44,7 +44,7 @@ class InitialOwnerBootstrapTests {
                 new BootstrapOwnerProperties();
 
         properties.setUsername(
-                "  Bootstrap.Admin  "
+                "  Bootstrap.Owner  "
         );
 
         properties.setPassword(
@@ -60,14 +60,14 @@ class InitialOwnerBootstrapTests {
     }
 
     @Test
-    void shouldCreateInitialAdministratorWhenNoneExists() {
+    void shouldCreateProtectedOwnerWhenNoneExists() {
 
         when(
-                repository.existsByRole(
-                        SecurityRole.ADMIN
-                )
+                repository.existsByOwnerTrue()
         )
-                .thenReturn(false);
+                .thenReturn(
+                        false
+                );
 
         bootstrap.run(
                 new DefaultApplicationArguments(
@@ -75,33 +75,24 @@ class InitialOwnerBootstrapTests {
                 )
         );
 
-        verify(accountService)
-                .createAccount(
-                        eq(
-                                "  Bootstrap.Admin  "
-                        ),
-                        eq(
-                                "bootstrap-password"
-                        ),
-                        eq(true),
-                        eq(
-                                Set.of(
-                                        SecurityRole.USER,
-                                        SecurityRole.ADMIN
-                                )
-                        )
+        verify(
+                accountService
+        )
+                .createOwnerAccount(
+                        "  Bootstrap.Owner  ",
+                        "bootstrap-password"
                 );
     }
 
     @Test
-    void shouldDoNothingWhenAdministratorAlreadyExists() {
+    void shouldDoNothingWhenOwnerAlreadyExists() {
 
         when(
-                repository.existsByRole(
-                        SecurityRole.ADMIN
-                )
+                repository.existsByOwnerTrue()
         )
-                .thenReturn(true);
+                .thenReturn(
+                        true
+                );
 
         bootstrap.run(
                 new DefaultApplicationArguments(
@@ -113,16 +104,47 @@ class InitialOwnerBootstrapTests {
                 accountService,
                 never()
         )
-                .createAccount(
+                .createOwnerAccount(
                         any(),
-                        any(),
-                        eq(true),
                         any()
                 );
     }
 
     @Test
-    void shouldFailWhenBootstrapConfigurationIsInvalid() {
+    void shouldCreateOwnerEvenWhenNormalAdministratorExists() {
+
+        when(
+                repository.existsByOwnerTrue()
+        )
+                .thenReturn(
+                        false
+                );
+
+        bootstrap.run(
+                new DefaultApplicationArguments(
+                        new String[0]
+                )
+        );
+
+        verify(
+                accountService
+        )
+                .createOwnerAccount(
+                        "  Bootstrap.Owner  ",
+                        "bootstrap-password"
+                );
+
+        verify(
+                repository,
+                never()
+        )
+                .existsByRole(
+                        SecurityRole.ADMIN
+                );
+    }
+
+    @Test
+    void shouldFailWhenOwnerBootstrapConfigurationIsInvalid() {
 
         properties.setUsername(
                 null
@@ -133,17 +155,15 @@ class InitialOwnerBootstrapTests {
         );
 
         when(
-                repository.existsByRole(
-                        SecurityRole.ADMIN
-                )
+                repository.existsByOwnerTrue()
         )
-                .thenReturn(false);
+                .thenReturn(
+                        false
+                );
 
         when(
-                accountService.createAccount(
+                accountService.createOwnerAccount(
                         any(),
-                        any(),
-                        eq(true),
                         any()
                 )
         )
@@ -165,7 +185,7 @@ class InitialOwnerBootstrapTests {
                         IllegalStateException.class
                 )
                 .hasMessage(
-                        "Valid bootstrap administrator credentials are required when no administrator exists"
+                        "Valid bootstrap Owner credentials are required when no protected Owner exists"
                 );
     }
 }
