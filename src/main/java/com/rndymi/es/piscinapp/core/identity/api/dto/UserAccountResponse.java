@@ -10,7 +10,8 @@ public record UserAccountResponse(
         UUID id,
         String username,
         boolean enabled,
-        List<SecurityRole> roles
+        List<SecurityRole> roles,
+        boolean owner
 ) {
 
     public static UserAccountResponse from(
@@ -24,7 +25,8 @@ public record UserAccountResponse(
                 account.getRoles()
                         .stream()
                         .sorted()
-                        .toList()
+                        .toList(),
+                account.isOwner()
         );
     }
 }

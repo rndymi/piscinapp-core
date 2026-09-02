@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -54,6 +55,12 @@ public class UserAccount {
     @Column(nullable = false)
     private boolean enabled;
 
+    @Column(
+            nullable = false
+    )
+    @ColumnDefault("false")
+    private boolean owner;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "account_roles",
@@ -81,14 +88,57 @@ public class UserAccount {
             Set<SecurityRole> roles
     ) {
 
+        this(
+                id,
+                username,
+                passwordHash,
+                enabled,
+                roles,
+                false
+        );
+    }
+
+    private UserAccount(
+            UUID id,
+            String username,
+            String passwordHash,
+            boolean enabled,
+            Set<SecurityRole> roles,
+            boolean owner
+    ) {
+
         this.id = id;
         this.username = username;
         this.passwordHash = passwordHash;
         this.enabled = enabled;
+        this.owner = owner;
 
         this.roles = roles.isEmpty()
-                ? EnumSet.noneOf(SecurityRole.class)
-                : EnumSet.copyOf(roles);
+                ? EnumSet.noneOf(
+                SecurityRole.class
+        )
+                : EnumSet.copyOf(
+                roles
+        );
+    }
+
+    public static UserAccount createOwner(
+            UUID id,
+            String username,
+            String passwordHash
+    ) {
+
+        return new UserAccount(
+                id,
+                username,
+                passwordHash,
+                true,
+                EnumSet.of(
+                        SecurityRole.USER,
+                        SecurityRole.ADMIN
+                ),
+                true
+        );
     }
 
     public UUID getId() {
@@ -105,6 +155,11 @@ public class UserAccount {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isOwner() {
+
+        return owner;
     }
 
     public Set<SecurityRole> getRoles() {

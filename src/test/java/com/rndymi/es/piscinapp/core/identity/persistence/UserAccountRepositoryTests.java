@@ -81,6 +81,11 @@ class UserAccountRepositoryTests {
                 .isFalse();
 
         assertThat(
+                persisted.isOwner()
+        )
+                .isFalse();
+
+        assertThat(
                 persisted.getRoles()
         )
                 .containsExactlyInAnyOrder(
@@ -94,6 +99,45 @@ class UserAccountRepositoryTests {
                 )
         )
                 .isTrue();
+    }
+
+    @Test
+    void shouldPersistProtectedOwnerState() {
+
+        UUID id =
+                UUID.randomUUID();
+
+        repository.saveAndFlush(
+                UserAccount.createOwner(
+                        id,
+                        "protected.owner",
+                        "{noop}encoded-password"
+                )
+        );
+
+        UserAccount persisted =
+                repository.findById(
+                                id
+                        )
+                        .orElseThrow();
+
+        assertThat(
+                persisted.isOwner()
+        )
+                .isTrue();
+
+        assertThat(
+                persisted.isEnabled()
+        )
+                .isTrue();
+
+        assertThat(
+                persisted.getRoles()
+        )
+                .containsExactlyInAnyOrder(
+                        SecurityRole.USER,
+                        SecurityRole.ADMIN
+                );
     }
 
     @Test
