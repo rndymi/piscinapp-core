@@ -140,6 +140,131 @@ class UserAccountServiceTests {
     }
 
     @Test
+    void shouldCreateProtectedOwner() {
+
+        when(
+                repository.existsByOwnerTrue()
+        )
+                .thenReturn(
+                        false
+                );
+
+        when(
+                repository.existsByUsername(
+                        "bootstrap.owner"
+                )
+        )
+                .thenReturn(
+                        false
+                );
+
+        when(
+                passwordEncoder.encode(
+                        "bootstrap-password"
+                )
+        )
+                .thenReturn(
+                        "encoded-owner-password"
+                );
+
+        when(
+                repository.saveAndFlush(
+                        any(
+                                UserAccount.class
+                        )
+                )
+        )
+                .thenAnswer(
+                        invocation ->
+                                invocation.getArgument(
+                                        0
+                                )
+                );
+
+        UserAccount owner =
+                service.createOwnerAccount(
+                        " Bootstrap.Owner ",
+                        "bootstrap-password"
+                );
+
+        assertThat(
+                owner.getUsername()
+        )
+                .isEqualTo(
+                        "bootstrap.owner"
+                );
+
+        assertThat(
+                owner.isOwner()
+        )
+                .isTrue();
+
+        assertThat(
+                owner.isEnabled()
+        )
+                .isTrue();
+
+        assertThat(
+                owner.getRoles()
+        )
+                .containsExactlyInAnyOrder(
+                        SecurityRole.USER,
+                        SecurityRole.ADMIN
+                );
+    }
+
+    @Test
+    void shouldCreateNormalAccountAsNonOwner() {
+
+        when(
+                repository.existsByUsername(
+                        "normal.user"
+                )
+        )
+                .thenReturn(
+                        false
+                );
+
+        when(
+                passwordEncoder.encode(
+                        "normal-password"
+                )
+        )
+                .thenReturn(
+                        "encoded-password"
+                );
+
+        when(
+                repository.saveAndFlush(
+                        any(
+                                UserAccount.class
+                        )
+                )
+        )
+                .thenAnswer(
+                        invocation ->
+                                invocation.getArgument(
+                                        0
+                                )
+                );
+
+        UserAccount account =
+                service.createAccount(
+                        "normal.user",
+                        "normal-password",
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER
+                        )
+                );
+
+        assertThat(
+                account.isOwner()
+        )
+                .isFalse();
+    }
+
+    @Test
     void shouldRejectBlankUsername() {
 
         assertThatThrownBy(

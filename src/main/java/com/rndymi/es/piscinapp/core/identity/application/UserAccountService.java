@@ -116,6 +116,75 @@ public class UserAccountService {
         }
     }
 
+    @Transactional
+    public UserAccount createOwnerAccount(
+            String username,
+            String rawPassword
+    ) {
+
+        if (
+                userAccountRepository
+                        .existsByOwnerTrue()
+        ) {
+
+            throw new IllegalStateException(
+                    "Protected Owner already exists"
+            );
+        }
+
+        String normalizedUsername =
+                validateAndNormalizeUsername(
+                        username
+                );
+
+        validatePassword(
+                rawPassword
+        );
+
+        if (
+                userAccountRepository
+                        .existsByUsername(
+                                normalizedUsername
+                        )
+        ) {
+
+            throw new UsernameConflictException();
+        }
+
+        UserAccount account =
+                UserAccount.createOwner(
+                        UUID.randomUUID(),
+                        normalizedUsername,
+                        passwordEncoder.encode(
+                                rawPassword
+                        )
+                );
+
+        try {
+
+            return userAccountRepository
+                    .saveAndFlush(
+                            account
+                    );
+
+        } catch (
+                DataIntegrityViolationException
+                        exception
+        ) {
+
+            if (
+                    isUsernameConstraintViolation(
+                            exception
+                    )
+            ) {
+
+                throw new UsernameConflictException();
+            }
+
+            throw exception;
+        }
+    }
+
     @Transactional(
             readOnly = true
     )
