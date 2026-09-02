@@ -305,4 +305,47 @@ class UserAccountRepositoryTests {
                         enabledAdmin.getId()
                 );
     }
+
+    @Test
+    void shouldDetectProtectedOwnerExplicitly() {
+
+        repository.saveAndFlush(
+                UserAccount.createOwner(
+                        UUID.randomUUID(),
+                        "repository.owner",
+                        "{noop}owner-password"
+                )
+        );
+
+        repository.saveAndFlush(
+                new UserAccount(
+                        UUID.randomUUID(),
+                        "normal.admin",
+                        "{noop}admin-password",
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER,
+                                SecurityRole.ADMIN
+                        )
+                )
+        );
+
+        assertThat(
+                repository.existsByOwnerTrue()
+        )
+                .isTrue();
+
+        assertThat(
+                repository.findAllByOwnerFalse()
+        )
+                .extracting(
+                        UserAccount::getUsername
+                )
+                .contains(
+                        "normal.admin"
+                )
+                .doesNotContain(
+                        "repository.owner"
+                );
+    }
 }
