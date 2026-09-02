@@ -2,6 +2,7 @@ package com.rndymi.es.piscinapp.core.identity.application;
 
 import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurrentPasswordException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
+import com.rndymi.es.piscinapp.core.identity.application.exception.OwnerAccountProtectedException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
 import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
@@ -236,6 +237,10 @@ public class UserAccountService {
                         id
                 );
 
+        ensureAdministrativeMutationAllowed(
+                account
+        );
+
         Set<SecurityRole> normalizedRoles =
                 normalizeRoles(
                         roles
@@ -271,6 +276,10 @@ public class UserAccountService {
                 getAccountForUpdate(
                         id
                 );
+
+        ensureAdministrativeMutationAllowed(
+                account
+        );
 
         if (
                 wouldRemoveLastEnabledAdmin(
@@ -342,6 +351,10 @@ public class UserAccountService {
                 getAccountForUpdate(
                         id
                 );
+
+        ensureAdministrativeMutationAllowed(
+                account
+        );
 
         validatePassword(
                 newPassword
@@ -583,5 +596,17 @@ public class UserAccountService {
         }
 
         return false;
+    }
+
+    private void ensureAdministrativeMutationAllowed(
+            UserAccount account
+    ) {
+
+        if (
+                account.isOwner()
+        ) {
+
+            throw new OwnerAccountProtectedException();
+        }
     }
 }

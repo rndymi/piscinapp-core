@@ -1,5 +1,6 @@
 package com.rndymi.es.piscinapp.core.identity.application;
 
+import com.rndymi.es.piscinapp.core.identity.application.exception.OwnerAccountProtectedException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
 import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
@@ -550,6 +551,107 @@ class UserAccountServiceTests {
                 .containsExactlyInAnyOrder(
                         SecurityRole.USER,
                         SecurityRole.ADMIN
+                );
+    }
+
+    @Test
+    void shouldRejectOwnerRoleReplacement() {
+
+        UserAccount owner =
+                UserAccount.createOwner(
+                        UUID.randomUUID(),
+                        "protected.owner",
+                        "encoded-password"
+                );
+
+        when(
+                repository.findWithRolesById(
+                        owner.getId()
+                )
+        )
+                .thenReturn(
+                        Optional.of(
+                                owner
+                        )
+                );
+
+        assertThatThrownBy(
+                () ->
+                        service.replaceRoles(
+                                owner.getId(),
+                                EnumSet.of(
+                                        SecurityRole.USER
+                                )
+                        )
+        )
+                .isInstanceOf(
+                        OwnerAccountProtectedException.class
+                );
+    }
+
+    @Test
+    void shouldRejectOwnerDisable() {
+
+        UserAccount owner =
+                UserAccount.createOwner(
+                        UUID.randomUUID(),
+                        "protected.owner",
+                        "encoded-password"
+                );
+
+        when(
+                repository.findWithRolesById(
+                        owner.getId()
+                )
+        )
+                .thenReturn(
+                        Optional.of(
+                                owner
+                        )
+                );
+
+        assertThatThrownBy(
+                () ->
+                        service.updateStatus(
+                                owner.getId(),
+                                false
+                        )
+        )
+                .isInstanceOf(
+                        OwnerAccountProtectedException.class
+                );
+    }
+
+    @Test
+    void shouldRejectOwnerPasswordResetAsAdmin() {
+
+        UserAccount owner =
+                UserAccount.createOwner(
+                        UUID.randomUUID(),
+                        "protected.owner",
+                        "encoded-password"
+                );
+
+        when(
+                repository.findWithRolesById(
+                        owner.getId()
+                )
+        )
+                .thenReturn(
+                        Optional.of(
+                                owner
+                        )
+                );
+
+        assertThatThrownBy(
+                () ->
+                        service.setPasswordAsAdmin(
+                                owner.getId(),
+                                "replacement-password-123"
+                        )
+        )
+                .isInstanceOf(
+                        OwnerAccountProtectedException.class
                 );
     }
 }
