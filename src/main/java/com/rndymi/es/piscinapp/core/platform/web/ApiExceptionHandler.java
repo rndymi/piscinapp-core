@@ -8,6 +8,7 @@ import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeAcco
 import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurrentPasswordException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
+import com.rndymi.es.piscinapp.core.identity.application.exception.OwnerAccountProtectedException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivityNotApplicableException;
@@ -354,6 +355,23 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .VISIT_INVALID_SCHEDULE,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            OwnerAccountProtectedException.class
+    )
+    ProblemDetail handleOwnerAccountProtected(
+            OwnerAccountProtectedException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .OWNER_ACCOUNT_PROTECTED,
                 request
         );
     }
