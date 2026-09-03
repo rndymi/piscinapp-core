@@ -105,20 +105,26 @@ Accounts contain:
 - a normalized username;
 - an encoded password;
 - enabled/disabled state;
-- `USER` and `ADMIN` security roles.
+- `USER` and `ADMIN` security roles;
+- protected Owner state.
 
 ---
 
-### DEV initial administrator
+### Development identities
 
-Normal DEV execution automatically provisions a disposable local administrator using fictitious values stored in the versioned DEV configuration.
+When the `dev` profile starts, Core first guarantees the protected Owner and then recreates the disposable development dataset.
 
-Default DEV identity:
+Default DEV identities:
 
-```text
-username: local.admin
-password: local-admin-password
-```
+| Identity | Username | Password |
+| --- | --- | --- |
+| Protected Owner | `local.owner` | `local-owner-password` |
+| Development administrator | `dev.admin` | `dev-admin-password` |
+| Development user | `dev.user` | `dev-user-password` |
+
+The protected Owner is persistent and is not removed by `DataSeederDev`.
+
+Normal DEV accounts and operational fixtures are recreated on DEV startup.
 
 These values are development-only credentials. They do not grant access to any real environment and must never be reused for FAKE_PROD or PROD.
 
@@ -130,26 +136,26 @@ docker compose -f docker-compose-db.yml up -d
 
 Then run `CoreApplication` normally.
 
-No bootstrap environment variables need to be exported manually and no IntelliJ IDEA Run/Debug environment configuration is required.
-
-Bootstrap is idempotent. Once an administrator exists, restarting Core does not create another administrator and does not modify the persisted administrator credentials.
+No bootstrap environment variables need to be exported manually and no IntelliJ IDEA Run/Debug environment configuration is required for normal DEV execution.
 
 ---
 
 ### Production-shaped bootstrap
 
-The same Spring configuration contract can be supplied externally through:
+Production-shaped environments must provide the protected Owner bootstrap credentials externally:
 
 ```text
-PISCINAPP_BOOTSTRAP_ADMIN_USERNAME
-PISCINAPP_BOOTSTRAP_ADMIN_PASSWORD
+PISCINAPP_BOOTSTRAP_OWNER_USERNAME
+PISCINAPP_BOOTSTRAP_OWNER_PASSWORD
 ```
-
-These variables are intended for production-shaped runtime configuration or explicit configuration overrides.
 
 Real production credentials must never be committed to the repository.
 
-PiscinApp Core currently provides persistent security accounts, OAuth2/OpenID Connect authentication, role-aware JWT authorization and the versioned `/api/v1` Identity and Access Management API.
+The protected Owner bootstrap is idempotent. If the Owner already exists, restarting Core does not create another Owner or replace its persisted credentials.
+
+`DataSeederDev` does not run with the `prod` profile.
+
+PiscinApp Core provides persistent security accounts, OAuth2/OpenID Connect authentication, role-aware JWT authorization and the versioned `/api/v1` Identity and Access Management API.
 
 ---
 
@@ -185,7 +191,9 @@ The registered redirect URI is:
 
 Use the Swagger Authorize action to authenticate through the real PiscinApp Authorization Server.
 
-The local disposable administrator created by the DEV bootstrap can be used for local validation.
+The disposable `dev.admin` account recreated by `DataSeederDev` can be used for normal local ADMIN validation.
+
+The protected `local.owner` account is reserved as the persistent administrative recovery identity.
 
 Bearer access tokens protect application resources and contain PiscinApp USER / ADMIN role information.
 
