@@ -6,19 +6,23 @@ import com.rndymi.es.piscinapp.core.crews.application.exception.CrewNotFoundExce
 import com.rndymi.es.piscinapp.core.crews.application.exception.CrewSupervisorConflictException;
 import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeAccountConflictException;
 import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeNotFoundException;
+import com.rndymi.es.piscinapp.core.execution.application.exception.VisitExecutionForbiddenException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurrentPasswordException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.OwnerAccountProtectedException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
+import com.rndymi.es.piscinapp.core.maintenance.application.exception.MaintenanceActivityNotFoundException;
+import com.rndymi.es.piscinapp.core.maintenance.application.exception.PoolMaintenanceActivityConflictException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivitiesPendingException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivityNotApplicableException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivityNotFoundException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivityStateConflictException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitCrewNotAssignableException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitInvalidScheduleException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitNotFoundException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitStateConflictException;
 import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
-import com.rndymi.es.piscinapp.core.maintenance.application.exception.MaintenanceActivityNotFoundException;
-import com.rndymi.es.piscinapp.core.maintenance.application.exception.PoolMaintenanceActivityConflictException;
 import com.rndymi.es.piscinapp.core.pools.application.exception.PoolNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -304,6 +308,74 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .VISIT_STATE_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitActivityStateConflictException.class
+    )
+    ProblemDetail handleVisitActivityStateConflict(
+            VisitActivityStateConflictException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_STATE_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitActivityNotFoundException.class
+    )
+    ProblemDetail handleVisitActivityNotFound(
+            VisitActivityNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_ACTIVITY_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitActivitiesPendingException.class
+    )
+    ProblemDetail handleVisitActivitiesPending(
+            VisitActivitiesPendingException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_ACTIVITIES_PENDING,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            VisitExecutionForbiddenException.class
+    )
+    ProblemDetail handleVisitExecutionForbidden(
+            VisitExecutionForbiddenException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_EXECUTION_FORBIDDEN,
                 request
         );
     }
