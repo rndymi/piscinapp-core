@@ -6,6 +6,7 @@ import com.rndymi.es.piscinapp.core.planning.domain.VisitStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 public final class VisitSpecifications {
@@ -45,6 +46,37 @@ public final class VisitSpecifications {
                                 criteria.crewId()
                         )
                 );
+    }
+
+    public static Specification<Visit> crewIn(
+            Set<UUID> crewIds
+    ) {
+
+        if (
+                crewIds == null
+                        ||
+                        crewIds.isEmpty()
+        ) {
+
+            return (
+                    root,
+                    query,
+                    criteriaBuilder
+            ) ->
+                    criteriaBuilder.disjunction();
+        }
+
+        return (
+                root,
+                query,
+                criteriaBuilder
+        ) ->
+                root.get(
+                                "crewId"
+                        )
+                        .in(
+                                crewIds
+                        );
     }
 
     private static Specification<Visit> dateEquals(
