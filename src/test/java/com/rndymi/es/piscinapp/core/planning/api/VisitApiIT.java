@@ -907,8 +907,6 @@ class VisitApiIT {
                                 )
                 );
 
-        // The variable is intentionally retained to make the fixture's
-        // second visit explicit and avoid accidental single-row coverage.
         org.assertj.core.api.Assertions
                 .assertThat(
                         earlier.getId()

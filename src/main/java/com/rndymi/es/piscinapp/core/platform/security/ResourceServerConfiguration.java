@@ -3,6 +3,7 @@ package com.rndymi.es.piscinapp.core.platform.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -54,6 +55,28 @@ public class ResourceServerConfiguration {
                                                 "/swagger-ui/**"
                                         )
                                         .permitAll()
+
+                                        .requestMatchers(
+                                                HttpMethod.GET,
+                                                "/api/v1/visits/assigned",
+                                                "/api/v1/visits/*/execution",
+                                                "/api/v1/visits/*/observations"
+                                        )
+                                        .authenticated()
+
+                                        .requestMatchers(
+                                                HttpMethod.PUT,
+                                                "/api/v1/visits/*/start",
+                                                "/api/v1/visits/*/complete",
+                                                "/api/v1/visits/*/activities/*/complete"
+                                        )
+                                        .authenticated()
+                                        .requestMatchers(
+                                                HttpMethod.POST,
+                                                "/api/v1/visits/*/observations"
+                                        )
+                                        .authenticated()
+
                                         .requestMatchers(
                                                 "/api/v1/users/**",
                                                 "/api/v1/employees/**",
