@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.Collections;
@@ -18,6 +20,9 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 @Entity
 @Table(
         name = "user_accounts",
@@ -29,7 +34,6 @@ import java.util.UUID;
 public class UserAccount {
 
     public static final int USERNAME_MAX_LENGTH = 100;
-
     private static final int PASSWORD_HASH_MAX_LENGTH = 255;
 
     @Id
@@ -76,9 +80,6 @@ public class UserAccount {
     @Enumerated(EnumType.STRING)
     private Set<SecurityRole> roles =
             EnumSet.noneOf(SecurityRole.class);
-
-    protected UserAccount() {
-    }
 
     public UserAccount(
             UUID id,

@@ -4,6 +4,7 @@ import com.rndymi.es.piscinapp.core.maintenance.application.exception.Maintenanc
 import com.rndymi.es.piscinapp.core.maintenance.domain.MaintenanceActivity;
 import com.rndymi.es.piscinapp.core.maintenance.persistence.MaintenanceActivityRepository;
 import com.rndymi.es.piscinapp.core.maintenance.persistence.MaintenanceActivitySpecifications;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,18 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class MaintenanceActivityService {
 
-    private final MaintenanceActivityRepository
-            maintenanceActivityRepository;
-
-    public MaintenanceActivityService(
-            MaintenanceActivityRepository maintenanceActivityRepository
-    ) {
-
-        this.maintenanceActivityRepository =
-                maintenanceActivityRepository;
-    }
+    private final MaintenanceActivityRepository maintenanceActivityRepository;
 
     @Transactional
     public MaintenanceActivity createActivity(

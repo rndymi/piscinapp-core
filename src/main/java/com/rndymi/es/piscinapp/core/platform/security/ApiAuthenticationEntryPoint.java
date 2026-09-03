@@ -3,6 +3,7 @@ package com.rndymi.es.piscinapp.core.platform.security;
 import com.rndymi.es.piscinapp.core.platform.web.ApiErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,19 +17,11 @@ import java.io.IOException;
 import java.net.URI;
 
 @Component
+@RequiredArgsConstructor
 public class ApiAuthenticationEntryPoint
         implements AuthenticationEntryPoint {
 
-    private final JsonMapper
-            jsonMapper;
-
-    public ApiAuthenticationEntryPoint(
-            JsonMapper jsonMapper
-    ) {
-
-        this.jsonMapper =
-                jsonMapper;
-    }
+    private final JsonMapper jsonMapper;
 
     @Override
     public void commence(

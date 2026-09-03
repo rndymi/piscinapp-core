@@ -4,6 +4,7 @@ import com.rndymi.es.piscinapp.core.pools.application.exception.PoolNotFoundExce
 import com.rndymi.es.piscinapp.core.pools.domain.SwimmingPool;
 import com.rndymi.es.piscinapp.core.pools.persistence.SwimmingPoolRepository;
 import com.rndymi.es.piscinapp.core.pools.persistence.SwimmingPoolSpecifications;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,18 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class SwimmingPoolService {
 
-    private final SwimmingPoolRepository
-            swimmingPoolRepository;
-
-    public SwimmingPoolService(
-            SwimmingPoolRepository swimmingPoolRepository
-    ) {
-
-        this.swimmingPoolRepository =
-                swimmingPoolRepository;
-    }
+    private final SwimmingPoolRepository swimmingPoolRepository;
 
     @Transactional
     public SwimmingPool createPool(

@@ -4,32 +4,19 @@ import com.rndymi.es.piscinapp.core.maintenance.application.exception.Maintenanc
 import com.rndymi.es.piscinapp.core.maintenance.domain.MaintenanceActivity;
 import com.rndymi.es.piscinapp.core.maintenance.persistence.MaintenanceActivityRepository;
 import com.rndymi.es.piscinapp.core.maintenance.persistence.PoolMaintenanceActivityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class MaintenancePlanningLookupService
         implements MaintenancePlanningLookup {
 
-    private final MaintenanceActivityRepository
-            maintenanceActivityRepository;
-
-    private final PoolMaintenanceActivityRepository
-            poolMaintenanceActivityRepository;
-
-    public MaintenancePlanningLookupService(
-            MaintenanceActivityRepository maintenanceActivityRepository,
-            PoolMaintenanceActivityRepository poolMaintenanceActivityRepository
-    ) {
-
-        this.maintenanceActivityRepository =
-                maintenanceActivityRepository;
-
-        this.poolMaintenanceActivityRepository =
-                poolMaintenanceActivityRepository;
-    }
+    private final MaintenanceActivityRepository maintenanceActivityRepository;
+    private final PoolMaintenanceActivityRepository poolMaintenanceActivityRepository;
 
     @Override
     @Transactional(readOnly = true)

@@ -9,6 +9,7 @@ import com.rndymi.es.piscinapp.core.employees.application.EmployeeService;
 import com.rndymi.es.piscinapp.core.platform.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,28 +25,12 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(
-        "/api/v1/employees"
-)
+@RequiredArgsConstructor
+@RequestMapping( "/api/v1/employees" )
 public class EmployeeController {
 
-    private final EmployeeService
-            employeeService;
-
-    private final EmployeePageRequestFactory
-            pageRequestFactory;
-
-    public EmployeeController(
-            EmployeeService employeeService,
-            EmployeePageRequestFactory pageRequestFactory
-    ) {
-
-        this.employeeService =
-                employeeService;
-
-        this.pageRequestFactory =
-                pageRequestFactory;
-    }
+    private final EmployeeService employeeService;
+    private final EmployeePageRequestFactory pageRequestFactory;
 
     @PostMapping
     @Operation(

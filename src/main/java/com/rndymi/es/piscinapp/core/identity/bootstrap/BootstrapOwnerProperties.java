@@ -1,8 +1,12 @@
 package com.rndymi.es.piscinapp.core.identity.bootstrap;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Getter
+@Setter
 @Component
 @ConfigurationProperties(
         prefix = "piscinapp.bootstrap.owner"
@@ -10,29 +14,6 @@ import org.springframework.stereotype.Component;
 public class BootstrapOwnerProperties {
 
     private String username;
+
     private String password;
-
-    public String getUsername() {
-
-        return username;
-    }
-
-    public void setUsername(
-            String username
-    ) {
-
-        this.username = username;
-    }
-
-    public String getPassword() {
-
-        return password;
-    }
-
-    public void setPassword(
-            String password
-    ) {
-
-        this.password = password;
-    }
 }

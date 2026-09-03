@@ -5,6 +5,7 @@ import com.rndymi.es.piscinapp.core.identity.api.dto.UserAccountResponse;
 import com.rndymi.es.piscinapp.core.identity.application.UserAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,21 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(
         "/api/v1/me"
 )
 public class CurrentUserController {
 
-    private final UserAccountService
-            userAccountService;
-
-    public CurrentUserController(
-            UserAccountService userAccountService
-    ) {
-
-        this.userAccountService =
-                userAccountService;
-    }
+    private final UserAccountService userAccountService;
 
     @GetMapping
     @Operation(

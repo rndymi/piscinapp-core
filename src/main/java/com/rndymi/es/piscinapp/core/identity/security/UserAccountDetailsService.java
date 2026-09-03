@@ -2,6 +2,7 @@ package com.rndymi.es.piscinapp.core.identity.security;
 
 import com.rndymi.es.piscinapp.core.identity.application.UsernameNormalizer;
 import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,19 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class UserAccountDetailsService
         implements UserDetailsService {
 
-    private final UserAccountRepository
-            userAccountRepository;
-
-    public UserAccountDetailsService(
-            UserAccountRepository userAccountRepository
-    ) {
-
-        this.userAccountRepository =
-                userAccountRepository;
-    }
+    private final UserAccountRepository userAccountRepository;
 
     @Override
     @Transactional(readOnly = true)

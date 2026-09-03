@@ -20,6 +20,7 @@ import com.rndymi.es.piscinapp.core.planning.persistence.VisitSpecifications;
 import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
 import com.rndymi.es.piscinapp.core.pools.application.PoolLookup;
 import com.rndymi.es.piscinapp.core.pools.application.PoolReference;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,61 +40,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class VisitService
         implements VisitLookup {
 
-    private final VisitRepository
-            visitRepository;
-
-    private final VisitMaintenanceActivityRepository
-            visitMaintenanceActivityRepository;
-
-    private final PoolLookup
-            poolLookup;
-
-    private final CrewLookup
-            crewLookup;
-
-    private final EmployeeLookup
-            employeeLookup;
-
-    private final MaintenancePlanningLookup
-            maintenancePlanningLookup;
-
-    private final Clock
-            clock;
-
-    public VisitService(
-            VisitRepository visitRepository,
-            VisitMaintenanceActivityRepository visitMaintenanceActivityRepository,
-            PoolLookup poolLookup,
-            CrewLookup crewLookup,
-            EmployeeLookup employeeLookup,
-            MaintenancePlanningLookup maintenancePlanningLookup,
-            Clock clock
-    ) {
-
-        this.visitRepository =
-                visitRepository;
-
-        this.visitMaintenanceActivityRepository =
-                visitMaintenanceActivityRepository;
-
-        this.poolLookup =
-                poolLookup;
-
-        this.crewLookup =
-                crewLookup;
-
-        this.employeeLookup =
-                employeeLookup;
-
-        this.maintenancePlanningLookup =
-                maintenancePlanningLookup;
-
-        this.clock =
-                clock;
-    }
+    private final VisitRepository visitRepository;
+    private final VisitMaintenanceActivityRepository visitMaintenanceActivityRepository;
+    private final PoolLookup poolLookup;
+    private final CrewLookup crewLookup;
+    private final EmployeeLookup employeeLookup;
+    private final MaintenancePlanningLookup maintenancePlanningLookup;
+    private final Clock clock;
 
     @Transactional
     public Visit createVisit(
