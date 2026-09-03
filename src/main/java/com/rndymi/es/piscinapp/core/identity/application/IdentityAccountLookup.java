@@ -7,4 +7,8 @@ public interface IdentityAccountLookup {
     void requireExistingAccount(
             UUID accountId
     );
+
+    UUID requireAccountIdByPrincipalName(
+            String principalName
+    );
 }

@@ -59,4 +59,23 @@ public class CrewLookupService
                 memberIds
         );
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<UUID> findCrewIdsByEmployeeId(
+            UUID employeeId
+    ) {
+
+        return crewMembershipRepository
+                .findAllByEmployeeId(
+                        employeeId
+                )
+                .stream()
+                .map(
+                        CrewMembership::getCrewId
+                )
+                .collect(
+                        Collectors.toUnmodifiableSet()
+                );
+    }
 }

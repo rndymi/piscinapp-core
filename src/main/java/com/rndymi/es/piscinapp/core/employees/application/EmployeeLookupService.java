@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,5 +39,24 @@ public class EmployeeLookupService
                 employee.getId(),
                 employee.isActive()
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<EmployeeReference> findEmployeeByAccountId(
+            UUID accountId
+    ) {
+
+        return employeeRepository
+                .findByUserAccountId(
+                        accountId
+                )
+                .map(
+                        employee ->
+                                new EmployeeReference(
+                                        employee.getId(),
+                                        employee.isActive()
+                                )
+                );
     }
 }

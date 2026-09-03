@@ -31,4 +31,8 @@ public interface CrewMembershipRepository
     findAllByCrewIdIn(
             Collection<UUID> crewIds
     );
+
+    List<CrewMembership> findAllByEmployeeId(
+            UUID employeeId
+    );
 }
