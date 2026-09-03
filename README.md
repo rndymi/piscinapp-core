@@ -126,6 +126,8 @@ The protected Owner is persistent and is not removed by `DataSeederDev`.
 
 Normal DEV accounts and operational fixtures are recreated on DEV startup.
 
+`DataSeederDev` runs only with the `dev` profile. Automated tests own their fixtures and do not preload the canonical DEV dataset.
+
 These values are development-only credentials. They do not grant access to any real environment and must never be reused for FAKE_PROD or PROD.
 
 A normal local startup requires only:

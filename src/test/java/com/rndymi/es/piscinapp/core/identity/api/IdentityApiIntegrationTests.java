@@ -525,6 +525,73 @@ class IdentityApiIntegrationTests {
     }
 
     @Test
+    void shouldAllowOwnerToChangeOwnPassword()
+            throws Exception {
+
+        UserAccount owner =
+                createOwner();
+
+        String newPassword =
+                "new-owner-password-123";
+
+        mockMvc.perform(
+                        put(
+                                "/api/v1/me/password"
+                        )
+                                .with(
+                                        jwt()
+                                                .jwt(
+                                                        jwt ->
+                                                                jwt.subject(
+                                                                        owner.getUsername()
+                                                                )
+                                                )
+                                                .authorities(
+                                                        new SimpleGrantedAuthority(
+                                                                "ROLE_USER"
+                                                        ),
+                                                        new SimpleGrantedAuthority(
+                                                                "ROLE_ADMIN"
+                                                        )
+                                                )
+                                )
+                                .contentType(
+                                        MediaType.APPLICATION_JSON
+                                )
+                                .content(
+                                        """
+                                        {
+                                          "currentPassword": "%s",
+                                          "newPassword": "%s"
+                                        }
+                                        """
+                                                .formatted(
+                                                        PASSWORD,
+                                                        newPassword
+                                                )
+                                )
+                )
+                .andExpect(
+                        status().isNoContent()
+                );
+
+        UserAccount persisted =
+                userAccountRepository
+                        .findById(
+                                owner.getId()
+                        )
+                        .orElseThrow();
+
+        assertThat(
+                passwordEncoder.matches(
+                        newPassword,
+                        persisted.getPasswordHash()
+                )
+        )
+                .isTrue();
+    }
+
+    @Test
     void shouldProtectLastEnabledAdministrator()
             throws Exception {
 
@@ -571,6 +638,100 @@ class IdentityApiIntegrationTests {
                                         "IDENTITY_LAST_ADMIN_CONFLICT"
                                 )
                 );
+    }
+
+    @Test
+    void shouldAllowAdministratorToDisableAnotherNonOwnerAdministrator()
+            throws Exception {
+
+        userAccountService
+                .createAccount(
+                        "second.admin",
+                        PASSWORD,
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER,
+                                SecurityRole.ADMIN
+                        )
+                );
+
+        UserAccount targetAdmin =
+                userAccountService
+                        .createAccount(
+                                "target.admin",
+                                PASSWORD,
+                                true,
+                                EnumSet.of(
+                                        SecurityRole.USER,
+                                        SecurityRole.ADMIN
+                                )
+                        );
+
+        mockMvc.perform(
+                        put(
+                                "/api/v1/users/{id}/status",
+                                targetAdmin.getId()
+                        )
+                                .with(
+                                        adminJwt()
+                                )
+                                .contentType(
+                                        MediaType.APPLICATION_JSON
+                                )
+                                .content(
+                                        """
+                                        {
+                                          "enabled": false
+                                        }
+                                        """
+                                )
+                )
+                .andExpect(
+                        status().isOk()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.id"
+                        )
+                                .value(
+                                        targetAdmin
+                                                .getId()
+                                                .toString()
+                                )
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.enabled"
+                        )
+                                .value(
+                                        false
+                                )
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.owner"
+                        )
+                                .value(
+                                        false
+                                )
+                );
+
+        UserAccount persisted =
+                userAccountRepository
+                        .findById(
+                                targetAdmin.getId()
+                        )
+                        .orElseThrow();
+
+        assertThat(
+                persisted.isEnabled()
+        )
+                .isFalse();
+
+        assertThat(
+                persisted.isOwner()
+        )
+                .isFalse();
     }
 
     @Test
