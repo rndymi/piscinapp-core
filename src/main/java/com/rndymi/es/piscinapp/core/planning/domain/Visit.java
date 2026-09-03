@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -68,6 +69,36 @@ public class Visit {
             length = NOTES_MAX_LENGTH
     )
     private String notes;
+
+    @Column(
+            name = "started_at"
+    )
+    private Instant startedAt;
+
+    @Column(
+            name = "started_by_account_id"
+    )
+    private UUID startedByAccountId;
+
+    @Column(
+            name = "started_by_employee_id"
+    )
+    private UUID startedByEmployeeId;
+
+    @Column(
+            name = "completed_at"
+    )
+    private Instant completedAt;
+
+    @Column(
+            name = "completed_by_account_id"
+    )
+    private UUID completedByAccountId;
+
+    @Column(
+            name = "completed_by_employee_id"
+    )
+    private UUID completedByEmployeeId;
 
     public Visit(
             UUID id,
@@ -145,5 +176,67 @@ public class Visit {
                     "Visit planning can only be changed while status is PLANNED"
             );
         }
+    }
+
+    private void requireStatus(
+            VisitStatus expectedStatus
+    ) {
+
+        if (
+                status
+                        != expectedStatus
+        ) {
+
+            throw new IllegalStateException(
+                    "Visit status must be "
+                            + expectedStatus
+            );
+        }
+    }
+
+    public void start(
+            Instant startedAt,
+            UUID accountId,
+            UUID employeeId
+    ) {
+
+        requireStatus(
+                VisitStatus.PLANNED
+        );
+
+        this.status =
+                VisitStatus.IN_PROGRESS;
+
+        this.startedAt =
+                startedAt;
+
+        this.startedByAccountId =
+                accountId;
+
+        this.startedByEmployeeId =
+                employeeId;
+    }
+
+    public void complete(
+            Instant completedAt,
+            UUID accountId,
+            UUID employeeId
+    ) {
+
+        requireStatus(
+                VisitStatus.IN_PROGRESS
+        );
+
+        this.status =
+                VisitStatus.COMPLETED;
+
+        this.completedAt =
+                completedAt;
+
+        this.completedByAccountId =
+                accountId;
+
+        this.completedByEmployeeId =
+                employeeId;
     }
 }
