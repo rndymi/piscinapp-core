@@ -6,6 +6,9 @@ import com.rndymi.es.piscinapp.core.crews.persistence.CrewMembershipRepository;
 import com.rndymi.es.piscinapp.core.crews.persistence.CrewRepository;
 import com.rndymi.es.piscinapp.core.employees.domain.Employee;
 import com.rndymi.es.piscinapp.core.employees.persistence.EmployeeRepository;
+import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
+import com.rndymi.es.piscinapp.core.identity.domain.UserAccount;
+import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
 import com.rndymi.es.piscinapp.core.maintenance.domain.MaintenanceActivity;
 import com.rndymi.es.piscinapp.core.maintenance.domain.PoolMaintenanceActivity;
 import com.rndymi.es.piscinapp.core.maintenance.persistence.MaintenanceActivityRepository;
@@ -25,23 +28,23 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.EnumSet;
+import java.util.function.Function;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DataSeederDevTests {
@@ -55,6 +58,14 @@ class DataSeederDevTests {
                             "Europe/Madrid"
                     )
             );
+
+    @Mock
+    private UserAccountRepository
+            userAccountRepository;
+
+    @Mock
+    private PasswordEncoder
+            passwordEncoder;
 
     @Mock
     private VisitMaintenanceActivityRepository
@@ -96,6 +107,8 @@ class DataSeederDevTests {
 
         seeder =
                 new DataSeederDev(
+                        userAccountRepository,
+                        passwordEncoder,
                         visitMaintenanceActivityRepository,
                         visitRepository,
                         poolMaintenanceActivityRepository,
@@ -106,10 +119,38 @@ class DataSeederDevTests {
                         swimmingPoolRepository,
                         FIXED_CLOCK
                 );
+
+        when(
+                userAccountRepository
+                        .findAllByOwnerFalse()
+        )
+                .thenReturn(
+                        List.of()
+                );
+
+        when(
+                passwordEncoder.encode(
+                        anyString()
+                )
+        )
+                .thenAnswer(
+                        invocation ->
+                                "encoded:"
+                                        + invocation.getArgument(
+                                        0,
+                                        String.class
+                                )
+                );
     }
 
     @Test
-    void shouldResetOperationalDataBeforeSeeding() {
+    void shouldSeedDevelopmentAccountsBeforeOperationalFixtures() {
+
+        InOrder order =
+                inOrder(
+                        userAccountRepository,
+                        swimmingPoolRepository
+                );
 
         seeder.run(
                 mock(
@@ -117,63 +158,40 @@ class DataSeederDevTests {
                 )
         );
 
-        InOrder order =
-                inOrder(
-                        visitMaintenanceActivityRepository,
-                        visitRepository,
-                        poolMaintenanceActivityRepository,
-                        crewMembershipRepository,
-                        crewRepository,
-                        employeeRepository,
-                        maintenanceActivityRepository,
-                        swimmingPoolRepository
+        order.verify(
+                        userAccountRepository
+                )
+                .findAllByOwnerFalse();
+
+        order.verify(
+                        userAccountRepository
+                )
+                .deleteAll(
+                        List.of()
                 );
 
         order.verify(
-                        visitMaintenanceActivityRepository
+                        userAccountRepository
                 )
-                .deleteAllInBatch();
+                .flush();
 
         order.verify(
-                        visitRepository
+                        userAccountRepository
                 )
-                .deleteAllInBatch();
+                .saveAll(
+                        anyList()
+                );
 
         order.verify(
-                        poolMaintenanceActivityRepository
+                        userAccountRepository
                 )
-                .deleteAllInBatch();
-
-        order.verify(
-                        crewMembershipRepository
-                )
-                .deleteAllInBatch();
-
-        order.verify(
-                        crewRepository
-                )
-                .deleteAllInBatch();
-
-        order.verify(
-                        employeeRepository
-                )
-                .deleteAllInBatch();
-
-        order.verify(
-                        maintenanceActivityRepository
-                )
-                .deleteAllInBatch();
-
-        order.verify(
-                        swimmingPoolRepository
-                )
-                .deleteAllInBatch();
+                .flush();
 
         order.verify(
                         swimmingPoolRepository
                 )
                 .saveAll(
-                        org.mockito.ArgumentMatchers.any()
+                        anyList()
                 );
     }
 
@@ -589,6 +607,132 @@ class DataSeederDevTests {
                                 "63000000-0000-0000-0000-000000000004"
                         )
                 );
+    }
+
+    @Test
+    void shouldSeedDeterministicDevelopmentAccounts() {
+
+        seeder.run(
+                mock(
+                        ApplicationArguments.class
+                )
+        );
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<UserAccount>> captor =
+                ArgumentCaptor.forClass(
+                        List.class
+                );
+
+        verify(
+                userAccountRepository
+        )
+                .saveAll(
+                        captor.capture()
+                );
+
+        verify(
+                passwordEncoder
+        )
+                .encode(
+                        DataSeederDev.DEV_ADMIN_PASSWORD
+                );
+
+        verify(
+                passwordEncoder
+        )
+                .encode(
+                        DataSeederDev.DEV_USER_PASSWORD
+                );
+
+        List<UserAccount> accounts =
+                captor.getValue();
+
+        assertThat(
+                accounts
+        )
+                .extracting(
+                        UserAccount::getId
+                )
+                .containsExactly(
+                        DataSeederDev.DEV_ADMIN_ACCOUNT_ID,
+                        DataSeederDev.DEV_USER_ACCOUNT_ID
+                );
+
+        assertThat(
+                accounts
+        )
+                .allMatch(
+                        account ->
+                                !account.isOwner()
+                );
+
+        UserAccount admin =
+                accounts.getFirst();
+
+        assertThat(
+                admin.getRoles()
+        )
+                .containsExactlyInAnyOrder(
+                        SecurityRole.USER,
+                        SecurityRole.ADMIN
+                );
+
+        UserAccount user =
+                accounts.get(1);
+
+        assertThat(
+                user.getRoles()
+        )
+                .containsExactly(
+                        SecurityRole.USER
+                );
+    }
+
+    @Test
+    void shouldPreserveProtectedOwnerDuringReset() {
+
+        UserAccount normalAccount =
+                new UserAccount(
+                        UUID.randomUUID(),
+                        "temporary.user",
+                        "encoded-password",
+                        true,
+                        EnumSet.of(
+                                SecurityRole.USER
+                        )
+                );
+
+        when(
+                userAccountRepository
+                        .findAllByOwnerFalse()
+        )
+                .thenReturn(
+                        List.of(
+                                normalAccount
+                        )
+                );
+
+        seeder.run(
+                mock(
+                        ApplicationArguments.class
+                )
+        );
+
+        verify(
+                userAccountRepository
+        )
+                .deleteAll(
+                        List.of(
+                                normalAccount
+                        )
+                );
+
+        verify(
+                userAccountRepository,
+                never()
+        )
+                .deleteAllInBatch();
     }
 
     @SuppressWarnings("unchecked")
