@@ -2,6 +2,7 @@ package com.rndymi.es.piscinapp.core.identity.application;
 
 import com.rndymi.es.piscinapp.core.identity.application.exception.InvalidCurrentPasswordException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConflictException;
+import com.rndymi.es.piscinapp.core.identity.application.exception.OwnerAccountProtectedException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
 import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
@@ -116,6 +117,75 @@ public class UserAccountService {
         }
     }
 
+    @Transactional
+    public UserAccount createOwnerAccount(
+            String username,
+            String rawPassword
+    ) {
+
+        if (
+                userAccountRepository
+                        .existsByOwnerTrue()
+        ) {
+
+            throw new IllegalStateException(
+                    "Protected Owner already exists"
+            );
+        }
+
+        String normalizedUsername =
+                validateAndNormalizeUsername(
+                        username
+                );
+
+        validatePassword(
+                rawPassword
+        );
+
+        if (
+                userAccountRepository
+                        .existsByUsername(
+                                normalizedUsername
+                        )
+        ) {
+
+            throw new UsernameConflictException();
+        }
+
+        UserAccount account =
+                UserAccount.createOwner(
+                        UUID.randomUUID(),
+                        normalizedUsername,
+                        passwordEncoder.encode(
+                                rawPassword
+                        )
+                );
+
+        try {
+
+            return userAccountRepository
+                    .saveAndFlush(
+                            account
+                    );
+
+        } catch (
+                DataIntegrityViolationException
+                        exception
+        ) {
+
+            if (
+                    isUsernameConstraintViolation(
+                            exception
+                    )
+            ) {
+
+                throw new UsernameConflictException();
+            }
+
+            throw exception;
+        }
+    }
+
     @Transactional(
             readOnly = true
     )
@@ -167,6 +237,10 @@ public class UserAccountService {
                         id
                 );
 
+        ensureAdministrativeMutationAllowed(
+                account
+        );
+
         Set<SecurityRole> normalizedRoles =
                 normalizeRoles(
                         roles
@@ -202,6 +276,10 @@ public class UserAccountService {
                 getAccountForUpdate(
                         id
                 );
+
+        ensureAdministrativeMutationAllowed(
+                account
+        );
 
         if (
                 wouldRemoveLastEnabledAdmin(
@@ -273,6 +351,10 @@ public class UserAccountService {
                 getAccountForUpdate(
                         id
                 );
+
+        ensureAdministrativeMutationAllowed(
+                account
+        );
 
         validatePassword(
                 newPassword
@@ -514,5 +596,17 @@ public class UserAccountService {
         }
 
         return false;
+    }
+
+    private void ensureAdministrativeMutationAllowed(
+            UserAccount account
+    ) {
+
+        if (
+                account.isOwner()
+        ) {
+
+            throw new OwnerAccountProtectedException();
+        }
     }
 }

@@ -7,6 +7,8 @@ import com.rndymi.es.piscinapp.core.identity.api.dto.UpdateUserStatusRequest;
 import com.rndymi.es.piscinapp.core.identity.api.dto.UserAccountResponse;
 import com.rndymi.es.piscinapp.core.identity.application.UserAccountService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -117,6 +119,32 @@ public class UserAccountController {
             summary =
                     "Replace an account security-role set"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account roles replaced"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid role set or malformed request"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Protected Owner account or last enabled administrator cannot have its roles changed"
+            )
+    })
     public UserAccountResponse replaceRoles(
             @PathVariable
             UUID id,
@@ -141,6 +169,32 @@ public class UserAccountController {
             summary =
                     "Enable or disable an account"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account status updated"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid or malformed request"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Protected Owner account or last enabled administrator cannot be disabled"
+            )
+    })
     public UserAccountResponse updateStatus(
             @PathVariable
             UUID id,
@@ -165,6 +219,32 @@ public class UserAccountController {
             summary =
                     "Set a new password for an account"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Account password updated"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Password does not satisfy the password policy or request is malformed"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "ADMIN role required"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Protected Owner password cannot be replaced through account administration"
+            )
+    })
     public ResponseEntity<Void>
     setPassword(
             @PathVariable

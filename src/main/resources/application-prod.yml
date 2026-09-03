@@ -40,3 +40,8 @@ piscinapp:
           scopes:
             - openid
             - profile
+
+  bootstrap:
+    owner:
+      username: ${PISCINAPP_BOOTSTRAP_OWNER_USERNAME}
+      password: ${PISCINAPP_BOOTSTRAP_OWNER_PASSWORD}

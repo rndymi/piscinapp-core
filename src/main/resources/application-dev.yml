@@ -39,6 +39,6 @@ piscinapp:
             - profile
 
   bootstrap:
-    admin:
-      username: local.admin
-      password: local-admin-password
+    owner:
+      username: local.owner
+      password: local-owner-password

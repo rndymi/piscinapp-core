@@ -27,6 +27,8 @@ public interface UserAccountRepository
             String username
     );
 
+    boolean existsByOwnerTrue();
+
     @Query("""
             select case
                        when count(account) > 0
@@ -60,6 +62,11 @@ public interface UserAccountRepository
             @Param("id")
             UUID id
     );
+
+    @EntityGraph(
+            attributePaths = "roles"
+    )
+    List<UserAccount> findAllByOwnerFalse();
 
     @Lock(
             LockModeType.PESSIMISTIC_WRITE
