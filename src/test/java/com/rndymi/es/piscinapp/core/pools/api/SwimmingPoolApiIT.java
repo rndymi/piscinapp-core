@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-class SwimmingPoolApiIntegrationTests {
+class SwimmingPoolApiIT {
 
     @Autowired
     private MockMvc mockMvc;

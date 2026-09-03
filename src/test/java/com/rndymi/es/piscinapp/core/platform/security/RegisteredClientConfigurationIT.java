@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class RegisteredClientConfigurationTests {
+class RegisteredClientConfigurationIT {
 
     @Autowired
     private RegisteredClientRepository

@@ -47,7 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DataSeederDevTests {
+class DataSeederDevTest {
 
     private static final Clock FIXED_CLOCK =
             Clock.fixed(

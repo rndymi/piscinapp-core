@@ -9,7 +9,7 @@ import org.springframework.data.domain.Sort;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class EmployeePageRequestFactoryTests {
+class EmployeePageRequestFactoryTest {
 
     private EmployeePageRequestFactory
             factory;

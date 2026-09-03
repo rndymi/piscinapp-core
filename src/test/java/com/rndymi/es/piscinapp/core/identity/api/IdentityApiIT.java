@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-class IdentityApiIntegrationTests {
+class IdentityApiIT {
 
     private static final String
             PASSWORD =

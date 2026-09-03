@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class CrewServiceTests {
+class CrewServiceIT {
 
     @Autowired
     private CrewService

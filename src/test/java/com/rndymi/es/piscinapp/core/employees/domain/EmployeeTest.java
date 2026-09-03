@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class EmployeeTests {
+class EmployeeTest {
 
     @Test
     void shouldCreateActiveEmployee() {

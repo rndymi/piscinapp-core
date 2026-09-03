@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class JwtRoleAuthoritiesConverterTests {
+class JwtRoleAuthoritiesConverterTest {
 
     private final JwtRoleAuthoritiesConverter
             converter =

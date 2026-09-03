@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class PoolMaintenanceConfigurationServiceTests {
+class PoolMaintenanceConfigurationServiceIT {
 
     @Autowired
     private SwimmingPoolService

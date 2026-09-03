@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class UserAccountCreationIntegrationTests {
+class UserAccountCreationIT {
 
     @Autowired
     private UserAccountService service;

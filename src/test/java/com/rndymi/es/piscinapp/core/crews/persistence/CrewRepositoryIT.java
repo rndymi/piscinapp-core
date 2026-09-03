@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class CrewRepositoryTests {
+class CrewRepositoryIT {
 
     @Autowired
     private CrewRepository

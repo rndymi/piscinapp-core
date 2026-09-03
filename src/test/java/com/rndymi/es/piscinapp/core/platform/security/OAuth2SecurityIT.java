@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-class OAuth2SecurityIntegrationTests {
+class OAuth2SecurityIT {
 
     private static final String CLIENT_ID =
             "piscinapp-test";

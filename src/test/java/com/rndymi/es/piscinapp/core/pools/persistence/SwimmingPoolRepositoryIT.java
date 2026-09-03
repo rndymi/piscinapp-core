@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class SwimmingPoolRepositoryTests {
+class SwimmingPoolRepositoryIT {
 
     @Autowired
     private SwimmingPoolRepository

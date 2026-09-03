@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-class CrewApiIntegrationTests {
+class CrewApiIT {
 
     @Autowired
     private MockMvc mockMvc;

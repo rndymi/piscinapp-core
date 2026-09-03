@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ProdDocumentationConfigurationTests {
+class ProdDocumentationConfigurationTest {
 
     @Test
     void shouldDisableOpenApiAndSwaggerInProduction()

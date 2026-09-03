@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-class PersistedAccountAuthenticationTests {
+class PersistedAccountAuthenticationIT {
 
     private static final String PASSWORD =
             "test-password-123";
