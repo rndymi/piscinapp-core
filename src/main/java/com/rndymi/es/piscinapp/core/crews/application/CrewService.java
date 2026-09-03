@@ -12,6 +12,7 @@ import com.rndymi.es.piscinapp.core.crews.persistence.CrewSpecifications;
 import com.rndymi.es.piscinapp.core.employees.application.EmployeeLookup;
 import com.rndymi.es.piscinapp.core.employees.application.EmployeeReference;
 import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,36 +28,16 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CrewService {
 
     private static final String
             MEMBERSHIP_CONSTRAINT =
             "uk_crew_memberships_crew_employee";
 
-    private final CrewRepository
-            crewRepository;
-
-    private final CrewMembershipRepository
-            crewMembershipRepository;
-
-    private final EmployeeLookup
-            employeeLookup;
-
-    public CrewService(
-            CrewRepository crewRepository,
-            CrewMembershipRepository crewMembershipRepository,
-            EmployeeLookup employeeLookup
-    ) {
-
-        this.crewRepository =
-                crewRepository;
-
-        this.crewMembershipRepository =
-                crewMembershipRepository;
-
-        this.employeeLookup =
-                employeeLookup;
-    }
+    private final CrewRepository crewRepository;
+    private final CrewMembershipRepository crewMembershipRepository;
+    private final EmployeeLookup employeeLookup;
 
     @Transactional
     public Crew createCrew(

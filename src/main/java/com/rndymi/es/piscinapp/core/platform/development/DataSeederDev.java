@@ -19,6 +19,7 @@ import com.rndymi.es.piscinapp.core.planning.persistence.VisitMaintenanceActivit
 import com.rndymi.es.piscinapp.core.planning.persistence.VisitRepository;
 import com.rndymi.es.piscinapp.core.pools.domain.SwimmingPool;
 import com.rndymi.es.piscinapp.core.pools.persistence.SwimmingPoolRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 @Profile("dev")
 @Order(100)
 public class DataSeederDev
@@ -132,86 +134,17 @@ public class DataSeederDev
                     "50000000-0000-0000-0000-000000000002"
             );
 
-    private final UserAccountRepository
-            userAccountRepository;
-
-    private final PasswordEncoder
-            passwordEncoder;
-
-    private final VisitMaintenanceActivityRepository
-            visitMaintenanceActivityRepository;
-
-    private final VisitRepository
-            visitRepository;
-
-    private final PoolMaintenanceActivityRepository
-            poolMaintenanceActivityRepository;
-
-    private final CrewMembershipRepository
-            crewMembershipRepository;
-
-    private final CrewRepository
-            crewRepository;
-
-    private final EmployeeRepository
-            employeeRepository;
-
-    private final MaintenanceActivityRepository
-            maintenanceActivityRepository;
-
-    private final SwimmingPoolRepository
-            swimmingPoolRepository;
-
-    private final Clock
-            clock;
-
-    public DataSeederDev(
-            UserAccountRepository userAccountRepository,
-            PasswordEncoder passwordEncoder,
-            VisitMaintenanceActivityRepository visitMaintenanceActivityRepository,
-            VisitRepository visitRepository,
-            PoolMaintenanceActivityRepository poolMaintenanceActivityRepository,
-            CrewMembershipRepository crewMembershipRepository,
-            CrewRepository crewRepository,
-            EmployeeRepository employeeRepository,
-            MaintenanceActivityRepository maintenanceActivityRepository,
-            SwimmingPoolRepository swimmingPoolRepository,
-            Clock clock
-    ) {
-
-        this.userAccountRepository =
-                userAccountRepository;
-
-        this.passwordEncoder =
-                passwordEncoder;
-
-        this.visitMaintenanceActivityRepository =
-                visitMaintenanceActivityRepository;
-
-        this.visitRepository =
-                visitRepository;
-
-        this.poolMaintenanceActivityRepository =
-                poolMaintenanceActivityRepository;
-
-        this.crewMembershipRepository =
-                crewMembershipRepository;
-
-        this.crewRepository =
-                crewRepository;
-
-        this.employeeRepository =
-                employeeRepository;
-
-        this.maintenanceActivityRepository =
-                maintenanceActivityRepository;
-
-        this.swimmingPoolRepository =
-                swimmingPoolRepository;
-
-        this.clock =
-                clock;
-    }
+    private final UserAccountRepository userAccountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final VisitMaintenanceActivityRepository visitMaintenanceActivityRepository;
+    private final VisitRepository visitRepository;
+    private final PoolMaintenanceActivityRepository poolMaintenanceActivityRepository;
+    private final CrewMembershipRepository crewMembershipRepository;
+    private final CrewRepository crewRepository;
+    private final EmployeeRepository employeeRepository;
+    private final MaintenanceActivityRepository maintenanceActivityRepository;
+    private final SwimmingPoolRepository swimmingPoolRepository;
+    private final Clock clock;
 
     @Override
     @Transactional

@@ -4,6 +4,7 @@ import com.rndymi.es.piscinapp.core.maintenance.api.dto.MaintenanceActivityRespo
 import com.rndymi.es.piscinapp.core.maintenance.application.PoolMaintenanceConfigurationService;
 import com.rndymi.es.piscinapp.core.platform.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,28 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(
-        "/api/v1/pools/{poolId}/maintenance-activities"
-)
+@RequiredArgsConstructor
+@RequestMapping( "/api/v1/pools/{poolId}/maintenance-activities" )
 public class PoolMaintenanceConfigurationController {
 
-    private final PoolMaintenanceConfigurationService
-            configurationService;
-
-    private final MaintenanceActivityPageRequestFactory
-            pageRequestFactory;
-
-    public PoolMaintenanceConfigurationController(
-            PoolMaintenanceConfigurationService configurationService,
-            MaintenanceActivityPageRequestFactory pageRequestFactory
-    ) {
-
-        this.configurationService =
-                configurationService;
-
-        this.pageRequestFactory =
-                pageRequestFactory;
-    }
+    private final PoolMaintenanceConfigurationService configurationService;
+    private final MaintenanceActivityPageRequestFactory pageRequestFactory;
 
     @GetMapping
     @Operation(

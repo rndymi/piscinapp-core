@@ -6,20 +6,25 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
+@Getter
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 @Entity
 @Table(
         name = "visits"
 )
 public class Visit {
 
-    public static final int
-            NOTES_MAX_LENGTH =
-            1000;
+    public static final int NOTES_MAX_LENGTH = 1000;
 
     @Id
     @Column(
@@ -64,9 +69,6 @@ public class Visit {
     )
     private String notes;
 
-    protected Visit() {
-    }
-
     public Visit(
             UUID id,
             UUID poolId,
@@ -96,34 +98,6 @@ public class Visit {
 
         this.notes =
                 notes;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public UUID getPoolId() {
-        return poolId;
-    }
-
-    public UUID getCrewId() {
-        return crewId;
-    }
-
-    public LocalDate getPlannedDate() {
-        return plannedDate;
-    }
-
-    public LocalTime getPlannedTime() {
-        return plannedTime;
-    }
-
-    public VisitStatus getStatus() {
-        return status;
-    }
-
-    public String getNotes() {
-        return notes;
     }
 
     public void updatePlanning(

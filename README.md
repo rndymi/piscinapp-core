@@ -355,7 +355,11 @@ Visit execution, activity completion, observations and incidents are not impleme
 
 ### Tests
 
-With PostgreSQL running:
+Core separates fast/local tests from tests that require the integrated application and PostgreSQL infrastructure.
+
+Surefire executes unit and focused tests using the `*Test` naming convention.
+
+With Maven:
 
 ```sh
 mvn test
@@ -367,6 +371,14 @@ Windows with Maven Wrapper:
 .\mvnw.cmd test
 ```
 
+Tests classified as integration/API/security tests use the *IT naming convention and are executed by Maven Failsafe during the verify lifecycle.
+
+Before running the complete verification locally, start PostgreSQL:
+
+```sh
+docker compose -f docker-compose-db.yml up -d
+```
+
 ---
 
 ### Automated verification
@@ -376,19 +388,41 @@ The complete local verification lifecycle is:
 ```sh
 mvn -B verify
 ```
+
 Windows:
 
 ```sh
 .\mvnw.cmd -B verify
 ```
 
-Verification executes the current Core test suite and generates the JaCoCo coverage report at:
+Verification executes:
+
+```text
+Surefire
+→ unit and focused `*Test` tests
+
+Failsafe
+→ integrated `*IT` tests
+→ PostgreSQL-backed integration/API/security behavior
+
+JaCoCo
+→ coverage report
+```
+
+The JaCoCo report is generated at:
 
 ```text
 target/site/jacoco/index.html
 ```
 
-GitHub Actions performs the same Maven verification against PostgreSQL, runs SonarCloud analysis, evaluates the configured Quality Gate, and validates that the production-oriented Core Docker image remains buildable.
+Maven test reports are available under:
+
+```text
+target/surefire-reports
+target/failsafe-reports
+```
+
+GitHub Actions performs the same PostgreSQL-backed Maven verification, runs SonarCloud analysis and its Quality Gate, performs GitHub CodeQL security analysis, and validates that the production-oriented Core Docker image remains buildable.
 
 ---
 

@@ -5,9 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@Getter
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 @Entity
 @Table(
         name = "employees",
@@ -19,7 +26,6 @@ import java.util.UUID;
 public class Employee {
 
     public static final int FIRST_NAME_MAX_LENGTH = 100;
-
     public static final int FAMILY_NAME_MAX_LENGTH = 150;
 
     @Id
@@ -52,9 +58,6 @@ public class Employee {
     )
     private UUID userAccountId;
 
-    protected Employee() {
-    }
-
     public Employee(
             UUID id,
             String firstName,
@@ -65,26 +68,6 @@ public class Employee {
         this.firstName = firstName;
         this.familyName = familyName;
         this.active = true;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getFamilyName() {
-        return familyName;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public UUID getUserAccountId() {
-        return userAccountId;
     }
 
     public String getDisplayName() {

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -31,28 +32,14 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(
         "/api/v1/visits"
 )
 public class VisitController {
 
-    private final VisitService
-            visitService;
-
-    private final VisitPageRequestFactory
-            pageRequestFactory;
-
-    public VisitController(
-            VisitService visitService,
-            VisitPageRequestFactory pageRequestFactory
-    ) {
-
-        this.visitService =
-                visitService;
-
-        this.pageRequestFactory =
-                pageRequestFactory;
-    }
+    private final VisitService visitService;
+    private final VisitPageRequestFactory pageRequestFactory;
 
     @PostMapping
     @Operation(

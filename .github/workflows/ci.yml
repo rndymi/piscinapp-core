@@ -13,6 +13,8 @@ jobs:
 
     permissions:
       contents: read
+      actions: read
+      security-events: write
 
     services:
       postgres:
@@ -52,6 +54,13 @@ jobs:
           java-version: 21
           cache: maven
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+
+        with:
+          languages: java
+          queries: security-extended
+
       - name: Prepare Maven Wrapper
         run: chmod +x mvnw
 
@@ -60,10 +69,12 @@ jobs:
 
       - name: Analyze with SonarCloud
         if: github.ref == 'refs/heads/develop'
+
         env:
           SONAR_PISCINAPP_CORE_TOKEN: ${{ secrets.SONAR_PISCINAPP_CORE_TOKEN }}
           SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
           SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+
         run: >
           ./mvnw -B sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
@@ -72,6 +83,9 @@ jobs:
           -Dsonar.token=${SONAR_PISCINAPP_CORE_TOKEN}
           -Dsonar.qualitygate.wait=true
           -Dsonar.qualitygate.timeout=300
+
+      - name: Analyze with CodeQL
+        uses: github/codeql-action/analyze@v4
 
       - name: Build production Core image
         run: docker build -t piscinapp-core:ci .

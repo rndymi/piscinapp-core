@@ -1,6 +1,7 @@
 package com.rndymi.es.piscinapp.core.employees.api;
 
 import com.rndymi.es.piscinapp.core.platform.web.PageRequestFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class EmployeePageRequestFactory {
 
     private static final Set<String>
@@ -18,16 +20,7 @@ public class EmployeePageRequestFactory {
                     "active"
             );
 
-    private final PageRequestFactory
-            pageRequestFactory;
-
-    public EmployeePageRequestFactory(
-            PageRequestFactory pageRequestFactory
-    ) {
-
-        this.pageRequestFactory =
-                pageRequestFactory;
-    }
+    private final PageRequestFactory pageRequestFactory;
 
     public Pageable create(
             int page,

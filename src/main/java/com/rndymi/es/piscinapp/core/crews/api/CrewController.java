@@ -9,6 +9,7 @@ import com.rndymi.es.piscinapp.core.crews.domain.Crew;
 import com.rndymi.es.piscinapp.core.platform.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,28 +28,14 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(
         "/api/v1/crews"
 )
 public class CrewController {
 
-    private final CrewService
-            crewService;
-
-    private final CrewPageRequestFactory
-            pageRequestFactory;
-
-    public CrewController(
-            CrewService crewService,
-            CrewPageRequestFactory pageRequestFactory
-    ) {
-
-        this.crewService =
-                crewService;
-
-        this.pageRequestFactory =
-                pageRequestFactory;
-    }
+    private final CrewService crewService;
+    private final CrewPageRequestFactory pageRequestFactory;
 
     @PostMapping
     @Operation(

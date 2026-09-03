@@ -5,9 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@Getter
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 @Entity
 @Table(
         name = "pool_maintenance_activities",
@@ -42,9 +49,6 @@ public class PoolMaintenanceActivity {
     )
     private UUID maintenanceActivityId;
 
-    protected PoolMaintenanceActivity() {
-    }
-
     public PoolMaintenanceActivity(
             UUID id,
             UUID poolId,
@@ -59,17 +63,5 @@ public class PoolMaintenanceActivity {
 
         this.maintenanceActivityId =
                 maintenanceActivityId;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public UUID getPoolId() {
-        return poolId;
-    }
-
-    public UUID getMaintenanceActivityId() {
-        return maintenanceActivityId;
     }
 }

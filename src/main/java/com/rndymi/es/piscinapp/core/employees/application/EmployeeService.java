@@ -6,6 +6,7 @@ import com.rndymi.es.piscinapp.core.employees.domain.Employee;
 import com.rndymi.es.piscinapp.core.employees.persistence.EmployeeRepository;
 import com.rndymi.es.piscinapp.core.employees.persistence.EmployeeSpecifications;
 import com.rndymi.es.piscinapp.core.identity.application.IdentityAccountLookup;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,29 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeService {
 
     private static final String
             ACCOUNT_CONSTRAINT =
             "uk_employees_user_account_id";
 
-    private final EmployeeRepository
-            employeeRepository;
-
-    private final IdentityAccountLookup
-            identityAccountLookup;
-
-    public EmployeeService(
-            EmployeeRepository employeeRepository,
-            IdentityAccountLookup identityAccountLookup
-    ) {
-
-        this.employeeRepository =
-                employeeRepository;
-
-        this.identityAccountLookup =
-                identityAccountLookup;
-    }
+    private final EmployeeRepository employeeRepository;
+    private final IdentityAccountLookup identityAccountLookup;
 
     @Transactional
     public Employee createEmployee(

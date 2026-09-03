@@ -8,6 +8,7 @@ import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConfl
 import com.rndymi.es.piscinapp.core.identity.domain.SecurityRole;
 import com.rndymi.es.piscinapp.core.identity.domain.UserAccount;
 import com.rndymi.es.piscinapp.core.identity.persistence.UserAccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,35 +21,18 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserAccountService {
 
-    private static final int
-            PASSWORD_MIN_LENGTH = 12;
-
-    private static final int
-            PASSWORD_MAX_LENGTH = 128;
+    private static final int PASSWORD_MIN_LENGTH = 12;
+    private static final int PASSWORD_MAX_LENGTH = 128;
 
     private static final String
             USERNAME_CONSTRAINT =
             "uk_user_accounts_username";
 
-    private final UserAccountRepository
-            userAccountRepository;
-
-    private final PasswordEncoder
-            passwordEncoder;
-
-    public UserAccountService(
-            UserAccountRepository userAccountRepository,
-            PasswordEncoder passwordEncoder
-    ) {
-
-        this.userAccountRepository =
-                userAccountRepository;
-
-        this.passwordEncoder =
-                passwordEncoder;
-    }
+    private final UserAccountRepository userAccountRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserAccount createAccount(

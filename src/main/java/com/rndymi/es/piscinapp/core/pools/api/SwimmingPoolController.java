@@ -8,6 +8,7 @@ import com.rndymi.es.piscinapp.core.pools.api.dto.UpdateSwimmingPoolStatusReques
 import com.rndymi.es.piscinapp.core.pools.application.SwimmingPoolService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,28 +23,12 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(
-        "/api/v1/pools"
-)
+@RequiredArgsConstructor
+@RequestMapping( "/api/v1/pools" )
 public class SwimmingPoolController {
 
-    private final SwimmingPoolService
-            swimmingPoolService;
-
-    private final SwimmingPoolPageRequestFactory
-            pageRequestFactory;
-
-    public SwimmingPoolController(
-            SwimmingPoolService swimmingPoolService,
-            SwimmingPoolPageRequestFactory pageRequestFactory
-    ) {
-
-        this.swimmingPoolService =
-                swimmingPoolService;
-
-        this.pageRequestFactory =
-                pageRequestFactory;
-    }
+    private final SwimmingPoolService swimmingPoolService;
+    private final SwimmingPoolPageRequestFactory pageRequestFactory;
 
     @PostMapping
     @Operation(

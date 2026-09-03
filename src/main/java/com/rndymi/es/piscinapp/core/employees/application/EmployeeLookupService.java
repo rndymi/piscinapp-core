@@ -3,25 +3,18 @@ package com.rndymi.es.piscinapp.core.employees.application;
 import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeNotFoundException;
 import com.rndymi.es.piscinapp.core.employees.domain.Employee;
 import com.rndymi.es.piscinapp.core.employees.persistence.EmployeeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeLookupService
         implements EmployeeLookup {
 
-    private final EmployeeRepository
-            employeeRepository;
-
-    public EmployeeLookupService(
-            EmployeeRepository employeeRepository
-    ) {
-
-        this.employeeRepository =
-                employeeRepository;
-    }
+    private final EmployeeRepository employeeRepository;
 
     @Override
     @Transactional(readOnly = true)

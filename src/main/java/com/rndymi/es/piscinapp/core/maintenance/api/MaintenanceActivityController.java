@@ -8,6 +8,7 @@ import com.rndymi.es.piscinapp.core.maintenance.application.MaintenanceActivityS
 import com.rndymi.es.piscinapp.core.platform.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,28 +23,12 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(
-        "/api/v1/maintenance-activities"
-)
+@RequiredArgsConstructor
+@RequestMapping( "/api/v1/maintenance-activities" )
 public class MaintenanceActivityController {
 
-    private final MaintenanceActivityService
-            maintenanceActivityService;
-
-    private final MaintenanceActivityPageRequestFactory
-            pageRequestFactory;
-
-    public MaintenanceActivityController(
-            MaintenanceActivityService maintenanceActivityService,
-            MaintenanceActivityPageRequestFactory pageRequestFactory
-    ) {
-
-        this.maintenanceActivityService =
-                maintenanceActivityService;
-
-        this.pageRequestFactory =
-                pageRequestFactory;
-    }
+    private final MaintenanceActivityService maintenanceActivityService;
+    private final MaintenanceActivityPageRequestFactory pageRequestFactory;
 
     @PostMapping
     @Operation(

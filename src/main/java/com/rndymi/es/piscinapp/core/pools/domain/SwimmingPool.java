@@ -4,22 +4,24 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@Getter
+@NoArgsConstructor(
+        access = AccessLevel.PROTECTED
+)
 @Entity
 @Table(
         name = "swimming_pools"
 )
 public class SwimmingPool {
 
-    public static final int
-            NAME_MAX_LENGTH =
-            150;
-
-    public static final int
-            ADDRESS_MAX_LENGTH =
-            300;
+    public static final int NAME_MAX_LENGTH = 150;
+    public static final int ADDRESS_MAX_LENGTH = 300;
 
     @Id
     @Column(
@@ -43,9 +45,6 @@ public class SwimmingPool {
     @Column(nullable = false)
     private boolean active;
 
-    protected SwimmingPool() {
-    }
-
     public SwimmingPool(
             UUID id,
             String name,
@@ -63,22 +62,6 @@ public class SwimmingPool {
 
         this.active =
                 true;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public boolean isActive() {
-        return active;
     }
 
     public void update(

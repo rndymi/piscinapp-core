@@ -9,6 +9,7 @@ import com.rndymi.es.piscinapp.core.maintenance.persistence.MaintenanceActivityS
 import com.rndymi.es.piscinapp.core.maintenance.persistence.PoolMaintenanceActivityRepository;
 import com.rndymi.es.piscinapp.core.pools.application.PoolLookup;
 import com.rndymi.es.piscinapp.core.pools.application.PoolReference;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,43 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PoolMaintenanceConfigurationService {
 
     private static final String
             CONFIGURATION_CONSTRAINT =
             "uk_pool_maintenance_activity";
 
-    private final PoolLookup
-            poolLookup;
-
-    private final MaintenanceActivityService
-            maintenanceActivityService;
-
-    private final MaintenanceActivityRepository
-            maintenanceActivityRepository;
-
-    private final PoolMaintenanceActivityRepository
-            configurationRepository;
-
-    public PoolMaintenanceConfigurationService(
-            PoolLookup poolLookup,
-            MaintenanceActivityService maintenanceActivityService,
-            MaintenanceActivityRepository maintenanceActivityRepository,
-            PoolMaintenanceActivityRepository configurationRepository
-    ) {
-
-        this.poolLookup =
-                poolLookup;
-
-        this.maintenanceActivityService =
-                maintenanceActivityService;
-
-        this.maintenanceActivityRepository =
-                maintenanceActivityRepository;
-
-        this.configurationRepository =
-                configurationRepository;
-    }
+    private final PoolLookup poolLookup;
+    private final MaintenanceActivityService maintenanceActivityService;
+    private final MaintenanceActivityRepository maintenanceActivityRepository;
+    private final PoolMaintenanceActivityRepository configurationRepository;
 
     @Transactional
     public void configure(
