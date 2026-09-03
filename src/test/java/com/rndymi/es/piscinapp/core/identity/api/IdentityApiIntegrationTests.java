@@ -132,6 +132,14 @@ class IdentityApiIntegrationTests {
                                 "$.passwordHash"
                         )
                                 .doesNotExist()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.owner"
+                        )
+                                .value(
+                                        false
+                                )
                 );
     }
 
@@ -565,6 +573,125 @@ class IdentityApiIntegrationTests {
                 );
     }
 
+    @Test
+    void shouldRejectOwnerRoleReplacement()
+            throws Exception {
+
+        UserAccount owner =
+                createOwner();
+
+        mockMvc.perform(
+                        put(
+                                "/api/v1/users/{id}/roles",
+                                owner.getId()
+                        )
+                                .with(
+                                        adminJwt()
+                                )
+                                .contentType(
+                                        MediaType.APPLICATION_JSON
+                                )
+                                .content(
+                                        """
+                                        {
+                                          "roles": [
+                                            "USER"
+                                          ]
+                                        }
+                                        """
+                                )
+                )
+                .andExpect(
+                        status().isConflict()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.code"
+                        )
+                                .value(
+                                        "OWNER_ACCOUNT_PROTECTED"
+                                )
+                );
+    }
+
+    @Test
+    void shouldRejectOwnerDisable()
+            throws Exception {
+
+        UserAccount owner =
+                createOwner();
+
+        mockMvc.perform(
+                        put(
+                                "/api/v1/users/{id}/status",
+                                owner.getId()
+                        )
+                                .with(
+                                        adminJwt()
+                                )
+                                .contentType(
+                                        MediaType.APPLICATION_JSON
+                                )
+                                .content(
+                                        """
+                                        {
+                                          "enabled": false
+                                        }
+                                        """
+                                )
+                )
+                .andExpect(
+                        status().isConflict()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.code"
+                        )
+                                .value(
+                                        "OWNER_ACCOUNT_PROTECTED"
+                                )
+                );
+    }
+
+    @Test
+    void shouldRejectOwnerPasswordResetByAdministrator()
+            throws Exception {
+
+        UserAccount owner =
+                createOwner();
+
+        mockMvc.perform(
+                        put(
+                                "/api/v1/users/{id}/password",
+                                owner.getId()
+                        )
+                                .with(
+                                        adminJwt()
+                                )
+                                .contentType(
+                                        MediaType.APPLICATION_JSON
+                                )
+                                .content(
+                                        """
+                                        {
+                                          "password": "replacement-password-123"
+                                        }
+                                        """
+                                )
+                )
+                .andExpect(
+                        status().isConflict()
+                )
+                .andExpect(
+                        jsonPath(
+                                "$.code"
+                        )
+                                .value(
+                                        "OWNER_ACCOUNT_PROTECTED"
+                                )
+                );
+    }
+
     private org.springframework.test.web.servlet
             .request.RequestPostProcessor
     adminJwt() {
@@ -582,6 +709,20 @@ class IdentityApiIntegrationTests {
                         ),
                         new SimpleGrantedAuthority(
                                 "ROLE_ADMIN"
+                        )
+                );
+    }
+
+    private UserAccount createOwner() {
+
+        return userAccountRepository
+                .saveAndFlush(
+                        UserAccount.createOwner(
+                                UUID.randomUUID(),
+                                "protected.owner",
+                                passwordEncoder.encode(
+                                        PASSWORD
+                                )
                         )
                 );
     }
