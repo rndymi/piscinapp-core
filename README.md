@@ -14,7 +14,9 @@ Current development version: `v1.1.0-SNAPSHOT`.
 
 ---
 
-### Local execution with IntelliJ
+### Local development
+
+#### IntelliJ IDEA
 
 Start PostgreSQL:
 
@@ -24,9 +26,7 @@ docker compose -f docker-compose-db.yml up -d
 
 Run `CoreApplication` from IntelliJ IDEA.
 
----
-
-### Local execution with Docker
+#### Docker
 
 Build and start the local stack:
 
@@ -46,9 +46,7 @@ Stop the local stack:
 docker compose down
 ```
 
----
-
-### PostgreSQL
+#### PostgreSQL
 
 Open the PostgreSQL console:
 
@@ -65,39 +63,37 @@ Useful commands:
 \q                              Exit
 ```
 
----
-
-### Health
+#### Health
 
 With Core running locally, check its health:
 
 ```sh
 curl http://localhost:8080/actuator/health
-````
+```
 
 Expected result: a health response with `status` equal to `UP`.
 
-Only the minimum Actuator health capability is exposed by the current bootstrap.
+Only the minimum Actuator health capability is exposed.
 
 ---
 
 ### API documentation
 
-With the dev profile, Swagger UI is available at:
+With the `dev` profile, Swagger UI is available at:
 
-* Cliente Web: http://localhost:8080/swagger-ui/index.html
+- http://localhost:8080/swagger-ui/index.html
 
 OpenAPI JSON is available at:
 
-* http://localhost:8080/v3/api-docs
+- http://localhost:8080/v3/api-docs
 
-Swagger UI and OpenAPI documentation are disabled by configuration in the prod profile.
+Swagger UI and OpenAPI documentation are disabled by configuration in the `prod` profile.
 
 ---
 
-### Identity bootstrap
+### Authentication and API access
 
-PiscinApp Core persists application security accounts in PostgreSQL.
+PiscinApp Core persists application security accounts in PostgreSQL and acts as both an OAuth2/OpenID Connect Authorization Server and a Bearer-token Resource Server.
 
 Accounts contain:
 
@@ -108,9 +104,11 @@ Accounts contain:
 - `USER` and `ADMIN` security roles;
 - protected Owner state.
 
----
+Persisted PiscinApp accounts authenticate through the Authorization Code flow with PKCE.
 
-### Development identities
+Access tokens are signed JWTs and contain the security roles required by Core authorization.
+
+#### Development identities
 
 When the `dev` profile starts, Core first guarantees the protected Owner and then recreates the disposable development dataset.
 
@@ -140,9 +138,7 @@ Then run `CoreApplication` normally.
 
 No bootstrap environment variables need to be exported manually and no IntelliJ IDEA Run/Debug environment configuration is required for normal DEV execution.
 
----
-
-### Production-shaped bootstrap
+#### Production-shaped bootstrap
 
 Production-shaped environments must provide the protected Owner bootstrap credentials externally:
 
@@ -157,29 +153,14 @@ The protected Owner bootstrap is idempotent. If the Owner already exists, restar
 
 `DataSeederDev` does not run with the `prod` profile.
 
-PiscinApp Core provides persistent security accounts, OAuth2/OpenID Connect authentication, role-aware JWT authorization and the versioned `/api/v1` Identity and Access Management API.
-
----
-
-### OAuth2 / OpenID Connect authentication
-
-PiscinApp Core acts as both an OAuth2/OpenID Connect Authorization Server and a Bearer-token Resource Server.
-
-Persisted PiscinApp accounts authenticate through the Authorization Code flow with PKCE. Access tokens are signed JWTs and include the account security roles required by Core authorization.
-
----
-
-### DEV Swagger authentication
-
-Swagger UI is available in DEV at:
-
-* http://localhost:8080/swagger-ui/index.html
+#### DEV Swagger authentication
 
 The DEV OAuth2 client is:
 
 ```text
 piscinapp-swagger
 ```
+
 It is a public client:
 
 ```text
@@ -187,76 +168,72 @@ Authorization Code
 PKCE required
 no client secret
 ```
+
 The registered redirect URI is:
 
-* http://localhost:8080/swagger-ui/oauth2-redirect.html
+- http://localhost:8080/swagger-ui/oauth2-redirect.html
 
 Use the Swagger Authorize action to authenticate through the real PiscinApp Authorization Server.
 
-The disposable `dev.admin` account recreated by `DataSeederDev` can be used for normal local ADMIN validation.
+The disposable `dev.admin` account can be used for normal local ADMIN validation.
 
 The protected `local.owner` account is reserved as the persistent administrative recovery identity.
 
-Bearer access tokens protect application resources and contain PiscinApp USER / ADMIN role information.
+Swagger UI and OpenAPI documentation remain disabled under the `prod` profile.
 
-Swagger UI and OpenAPI documentation remain disabled under the prod profile.
-
-Final OAuth2 client registrations for piscinapp-control and piscinapp-field are not defined yet. They will be introduced when those clients have real redirect and deployment contracts.
+Final OAuth2 client registrations for `piscinapp-control` and `piscinapp-field` are not defined yet. They will be introduced when those clients have real redirect and deployment contracts.
 
 ---
 
 ### Identity API
 
-The first functional Core API is exposed under:
+Identity and Access Management is exposed under:
 
-* `/api/v1/me`
-* `/api/v1/users`
+- `/api/v1/me`
+- `/api/v1/users`
 
-Authenticated users can inspect their current security account and change
-their own password.
+Authenticated users can inspect their current security account and change their own password.
 
-Account creation, listing, role management, status management and
-administrator password replacement require the `ADMIN` role.
+Account creation, listing, role management, status management and administrator password replacement require the `ADMIN` role.
 
-The API uses OAuth2 Bearer access tokens and machine-readable
-`ProblemDetail` error responses.
+The API uses OAuth2 Bearer access tokens and machine-readable `ProblemDetail` error responses.
 
 Password values and password hashes are never returned by the API.
 
-Account role, status and password changes do not immediately revoke
-already-issued JWT access tokens. Existing tokens remain subject to
-their configured lifetime.
+Account role, status and password changes do not immediately revoke already-issued JWT access tokens. Existing tokens remain subject to their configured lifetime.
 
 ---
 
-### Employee API
+### Operational API
 
-The `v1.1.0` development line introduces operational employee management.
+PiscinApp Core manages the operational configuration and lifecycle required to organize swimming-pool maintenance work.
 
-Employees are independent from security accounts and contain:
+#### Employees
+
+Employee administration is exposed under:
+
+- `/api/v1/employees`
+
+Employees contain:
 
 - a stable employee UUID;
 - first name and family name;
 - active/inactive operational state;
 - an optional associated security-account UUID.
 
-Employee administration is exposed under:
-
-* `/api/v1/employees`
-
 Employee administration requires the `ADMIN` role.
 
 The employee collection supports bounded pagination, active-state filtering, case-insensitive name search and controlled sorting.
 
-An employee may optionally be associated with an existing PiscinApp security account. Employee lifecycle and account lifecycle remain independent.
+Employee lifecycle and security-account lifecycle remain independent.
 
 Normal employee hard deletion is not exposed.
 
----
+#### Pools and maintenance
 
-### Pool and maintenance configuration API
+Swimming-pool administration is exposed under:
 
-The `v1.1.0` development line provides swimming-pool and maintenance-activity master-data configuration.
+- `/api/v1/pools`
 
 Swimming pools contain:
 
@@ -265,36 +242,32 @@ Swimming pools contain:
 - an address;
 - active/inactive state.
 
-Pool administration is exposed under:
+Maintenance-activity administration is exposed under:
 
-* `/api/v1/pools`
+- `/api/v1/maintenance-activities`
 
-Maintenance activities are configurable persisted records containing:
+Maintenance activities contain:
 
 - a stable UUID;
 - a name;
 - an optional plain-text description;
 - active/inactive state.
 
-Maintenance-activity administration is exposed under:
+Administrators configure which maintenance activities are applicable to each swimming pool through:
 
-* `/api/v1/maintenance-activities`
-
-Administrators can configure which maintenance activities are applicable to each swimming pool through:
-
-* `/api/v1/pools/{poolId}/maintenance-activities`
+- `/api/v1/pools/{poolId}/maintenance-activities`
 
 Pool, maintenance-activity and applicability administration requires the `ADMIN` role.
 
-Pool and maintenance-activity collections support bounded pagination, active-state filtering, case-insensitive search and controlled sorting.
+Collections support bounded pagination, active-state filtering, case-insensitive search and controlled sorting where applicable.
 
-Deactivation preserves master data and existing applicability configuration. Normal hard deletion of swimming pools and maintenance activities is not exposed.
+Deactivation preserves configured master data. Normal hard deletion of swimming pools and maintenance activities is not exposed.
 
----
+#### Crews
 
-### Crew organization API
+Crew administration is exposed under:
 
-The `v1.1.0` development line provides operational crew organization.
+- `/api/v1/crews`
 
 A crew contains:
 
@@ -304,10 +277,6 @@ A crew contains:
 - employee membership;
 - one optional designated supervisor employee.
 
-Crew administration is exposed through:
-
-* `/api/v1/crews`
-
 Administrators can add and remove employee memberships and explicitly assign, change or clear the crew supervisor.
 
 Only active employees may be newly added to a crew or designated as supervisor. The supervisor must already belong to the same crew.
@@ -316,32 +285,50 @@ Crew membership and supervisor responsibility are operational concepts and do no
 
 Crew deactivation preserves existing membership and supervisor configuration. Normal hard deletion of crews is not exposed.
 
----
+#### Visits
 
-### Scheduled visit planning API
+Visit planning and execution use the same canonical visit.
 
-The `v1.1.0` development line provides explicit operational visit planning.
-
-A planned visit contains:
+A visit contains:
 
 - a stable visit UUID;
 - one swimming-pool reference;
 - one assigned crew;
-- a planned date;
-- a planned time;
+- a planned date and time;
 - one or more selected maintenance activities;
-- a lifecycle state;
-- optional plain-text planning notes.
+- lifecycle state;
+- optional planning notes;
+- execution timestamps and actor identifiers when work is performed.
 
-Visit planning is exposed through:
+The supported visit lifecycle is:
 
-* `/api/v1/visits`
+```text
+PLANNED
+↓
+IN_PROGRESS
+↓
+COMPLETED
+```
 
-Administrators can create, retrieve, search, update and cancel planned visits.
+with the existing cancellation path:
 
-New visits start in the `PLANNED` state.
+```text
+PLANNED
+↓
+CANCELLED
+```
 
-Planning validates that the swimming pool is active, the assigned crew is currently operationally assignable and every selected maintenance activity is active and applicable to the selected swimming pool.
+Visit planning is exposed under:
+
+- `/api/v1/visits`
+
+Planning operations remain administrative. Administrators can create, retrieve, search, update and cancel planned visits.
+
+Planning validates that:
+
+- the swimming pool is active;
+- the assigned crew is operationally assignable;
+- every selected maintenance activity is active and applicable to the selected pool.
 
 Planned visits can be updated only while they remain in the `PLANNED` state.
 
@@ -349,17 +336,82 @@ Cancellation preserves the visit and its planned configuration. Normal hard dele
 
 The visit collection supports bounded pagination, exact-date and inclusive date-range filtering, lifecycle-state filtering, pool and crew filtering, and controlled sorting.
 
-Visit execution, activity completion, observations and incidents are not implemented by the current planning capability.
+Operational employees can discover their currently assigned work through:
+
+- `GET /api/v1/visits/assigned`
+
+The authenticated account is resolved internally to its associated employee. The client does not choose an `employeeId` for execution authority.
+
+An employee may execute a visit only when:
+
+- the authenticated account is associated with an employee;
+- the employee is active;
+- the employee currently belongs to the visit's assigned crew.
+
+Administrative authority does not automatically grant operational execution authority.
+
+Visit execution endpoints include:
+
+- `GET /api/v1/visits/{visitId}/execution`
+- `PUT /api/v1/visits/{visitId}/start`
+- `PUT /api/v1/visits/{visitId}/activities/{activityId}/complete`
+- `POST /api/v1/visits/{visitId}/observations`
+- `GET /api/v1/visits/{visitId}/observations`
+- `PUT /api/v1/visits/{visitId}/complete`
+
+Starting a visit changes:
+
+```text
+PLANNED
+→ IN_PROGRESS
+```
+
+and records:
+
+- execution start timestamp;
+- starting account UUID;
+- starting employee UUID.
+
+Selected maintenance activities begin in:
+
+```text
+PENDING
+```
+
+and may transition to:
+
+```text
+COMPLETED
+```
+
+Activity completion records:
+
+- completion timestamp;
+- account UUID;
+- employee UUID.
+
+A visit may become `COMPLETED` only when all selected maintenance activities are `COMPLETED`.
+
+Execution observations are immutable plain-text records created only while the visit is `IN_PROGRESS`.
+
+Each observation preserves:
+
+- its text;
+- creation timestamp;
+- account UUID;
+- employee UUID.
+
+Completed and cancelled visits reject further execution mutations.
+
+Incidents, evidence attachments, visit reopening, activity undo and advanced execution states are not implemented yet.
 
 ---
 
-### Tests
+### Testing and verification
 
-Core separates fast/local tests from tests that require the integrated application and PostgreSQL infrastructure.
+Core separates fast or focused tests from tests requiring the integrated application and PostgreSQL infrastructure.
 
-Surefire executes unit and focused tests using the `*Test` naming convention.
-
-With Maven:
+Maven Surefire executes tests using the `*Test` naming convention.
 
 ```sh
 mvn test
@@ -371,19 +423,15 @@ Windows with Maven Wrapper:
 .\mvnw.cmd test
 ```
 
-Tests classified as integration/API/security tests use the *IT naming convention and are executed by Maven Failsafe during the verify lifecycle.
+Integration, API and security tests use the `*IT` naming convention and are executed by Maven Failsafe during the `verify` lifecycle.
 
-Before running the complete verification locally, start PostgreSQL:
+Before complete local verification, start PostgreSQL:
 
 ```sh
 docker compose -f docker-compose-db.yml up -d
 ```
 
----
-
-### Automated verification
-
-The complete local verification lifecycle is:
+Run:
 
 ```sh
 mvn -B verify
@@ -422,7 +470,7 @@ target/surefire-reports
 target/failsafe-reports
 ```
 
-GitHub Actions performs the same PostgreSQL-backed Maven verification, runs SonarCloud analysis and its Quality Gate, performs GitHub CodeQL security analysis, and validates that the production-oriented Core Docker image remains buildable.
+GitHub Actions performs the PostgreSQL-backed Maven verification, runs SonarCloud analysis and its Quality Gate, performs GitHub CodeQL security analysis, and validates that the production-oriented Core Docker image remains buildable.
 
 ---
 
@@ -456,6 +504,6 @@ FAKE_PROD validates the production-shaped Core container, PostgreSQL connectivit
 mvn clean package
 ```
 
-The project currently contains the Core transversal platform and the first stable PiscinApp Identity and Access Management capability.
+The current `v1.1.0-SNAPSHOT` development line provides the operational Core required to manage employees, pools, maintenance activities, crews, scheduled visits and authenticated visit execution.
 
-Future business modules and definitive OAuth2 client integrations for `piscinapp-control` and `piscinapp-field` will evolve in subsequent versions as their real integration contracts are defined.
+Incidents, supervision and the final `v1.1.0` release remain outside the current implemented scope.

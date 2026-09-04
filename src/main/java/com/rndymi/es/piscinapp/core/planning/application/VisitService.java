@@ -6,12 +6,15 @@ import com.rndymi.es.piscinapp.core.employees.application.EmployeeLookup;
 import com.rndymi.es.piscinapp.core.employees.application.exception.EmployeeNotFoundException;
 import com.rndymi.es.piscinapp.core.maintenance.application.MaintenanceActivityReference;
 import com.rndymi.es.piscinapp.core.maintenance.application.MaintenancePlanningLookup;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivitiesPendingException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivityNotApplicableException;
+import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivityNotFoundException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitCrewNotAssignableException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitInvalidScheduleException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitNotFoundException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitStateConflictException;
 import com.rndymi.es.piscinapp.core.planning.domain.Visit;
+import com.rndymi.es.piscinapp.core.planning.domain.VisitActivityStatus;
 import com.rndymi.es.piscinapp.core.planning.domain.VisitMaintenanceActivity;
 import com.rndymi.es.piscinapp.core.planning.domain.VisitStatus;
 import com.rndymi.es.piscinapp.core.planning.persistence.VisitMaintenanceActivityRepository;
@@ -26,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,7 +46,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class VisitService
-        implements VisitLookup {
+        implements VisitLookup, VisitExecutionOperations {
 
     private final VisitRepository visitRepository;
     private final VisitMaintenanceActivityRepository visitMaintenanceActivityRepository;
@@ -199,8 +203,7 @@ public class VisitService
     }
 
     @Transactional(readOnly = true)
-    public Map<UUID, List<UUID>>
-    getActivityIdsByVisitIds(
+    public Map<UUID, List<UUID>> getActivityIdsByVisitIds(
             Collection<UUID> visitIds
     ) {
 
@@ -245,6 +248,281 @@ public class VisitService
                                 visitId
                         )
                 )
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public VisitExecutionReference requireExecutionVisit(
+            UUID visitId
+    ) {
+
+        Visit visit =
+                requireVisitEntity(
+                        visitId
+                );
+
+        List<VisitMaintenanceActivity> activities =
+                visitMaintenanceActivityRepository
+                        .findAllByVisitId(
+                                visitId
+                        );
+
+        return toExecutionReference(
+                visit,
+                activities
+        );
+    }
+
+    @Override
+    @Transactional
+    public VisitExecutionReference startVisit(
+            UUID visitId,
+            Instant startedAt,
+            UUID accountId,
+            UUID employeeId
+    ) {
+
+        Visit visit =
+                requireVisitEntity(
+                        visitId
+                );
+
+        if (
+                visit.getStatus()
+                        != VisitStatus.PLANNED
+        ) {
+
+            throw new VisitStateConflictException(
+                    visitId,
+                    visit.getStatus()
+            );
+        }
+
+        visit.start(
+                startedAt,
+                accountId,
+                employeeId
+        );
+
+        List<VisitMaintenanceActivity> activities =
+                visitMaintenanceActivityRepository
+                        .findAllByVisitId(
+                                visitId
+                        );
+
+        return toExecutionReference(
+                visit,
+                activities
+        );
+    }
+
+    @Override
+    @Transactional
+    public VisitActivityExecutionReference completeActivity(
+            UUID visitId,
+            UUID maintenanceActivityId,
+            Instant completedAt,
+            UUID accountId,
+            UUID employeeId
+    ) {
+
+        Visit visit =
+                requireVisitEntity(
+                        visitId
+                );
+
+        if (
+                visit.getStatus()
+                        != VisitStatus.IN_PROGRESS
+        ) {
+
+            throw new VisitStateConflictException(
+                    visitId,
+                    visit.getStatus()
+            );
+        }
+
+        VisitMaintenanceActivity activity =
+                visitMaintenanceActivityRepository
+                        .findByVisitIdAndMaintenanceActivityId(
+                                visitId,
+                                maintenanceActivityId
+                        )
+                        .orElseThrow(
+                                () ->
+                                        new VisitActivityNotFoundException(
+                                                visitId,
+                                                maintenanceActivityId
+                                        )
+                        );
+
+        if (
+                activity.getStatus()
+                        != VisitActivityStatus.PENDING
+        ) {
+
+            throw new VisitStateConflictException(
+                    visitId,
+                    visit.getStatus()
+            );
+        }
+
+        activity.complete(
+                completedAt,
+                accountId,
+                employeeId
+        );
+
+        return toActivityExecutionReference(
+                activity
+        );
+    }
+
+    @Override
+    @Transactional
+    public VisitExecutionReference completeVisit(
+            UUID visitId,
+            Instant completedAt,
+            UUID accountId,
+            UUID employeeId
+    ) {
+
+        Visit visit =
+                requireVisitEntity(
+                        visitId
+                );
+
+        if (
+                visit.getStatus()
+                        != VisitStatus.IN_PROGRESS
+        ) {
+
+            throw new VisitStateConflictException(
+                    visitId,
+                    visit.getStatus()
+            );
+        }
+
+        List<VisitMaintenanceActivity> activities =
+                visitMaintenanceActivityRepository
+                        .findAllByVisitId(
+                                visitId
+                        );
+
+        boolean hasPendingActivities =
+                activities
+                        .stream()
+                        .anyMatch(
+                                activity ->
+                                        activity.getStatus()
+                                                != VisitActivityStatus.COMPLETED
+                        );
+
+        if (hasPendingActivities) {
+
+            throw new VisitActivitiesPendingException(
+                    visitId
+            );
+        }
+
+        visit.complete(
+                completedAt,
+                accountId,
+                employeeId
+        );
+
+        return toExecutionReference(
+                visit,
+                activities
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<VisitExecutionReference> findAssignedVisits(
+            Set<UUID> crewIds,
+            LocalDate date,
+            LocalDate fromDate,
+            LocalDate toDate,
+            VisitStatus status,
+            Pageable pageable
+    ) {
+
+        if (
+                crewIds == null
+                        ||
+                        crewIds.isEmpty()
+        ) {
+
+            return Page.empty(
+                    pageable
+            );
+        }
+
+        VisitSearchCriteria criteria =
+                new VisitSearchCriteria(
+                        date,
+                        fromDate,
+                        toDate,
+                        status,
+                        null,
+                        null
+                );
+
+        validateCriteria(
+                criteria
+        );
+
+        Page<Visit> visits =
+                visitRepository
+                        .findAll(
+                                VisitSpecifications
+                                        .from(
+                                                criteria
+                                        )
+                                        .and(
+                                                VisitSpecifications.crewIn(
+                                                        crewIds
+                                                )
+                                        ),
+                                pageable
+                        );
+
+        List<UUID> visitIds =
+                visits
+                        .getContent()
+                        .stream()
+                        .map(
+                                Visit::getId
+                        )
+                        .toList();
+
+        Map<UUID, List<VisitMaintenanceActivity>> activitiesByVisit =
+                visitIds.isEmpty()
+                        ?
+                        Map.of()
+                        :
+                        visitMaintenanceActivityRepository
+                                .findAllByVisitIdIn(
+                                        visitIds
+                                )
+                                .stream()
+                                .collect(
+                                        Collectors.groupingBy(
+                                                VisitMaintenanceActivity::getVisitId
+                                        )
+                                );
+
+        return visits.map(
+                visit ->
+                        toExecutionReference(
+                                visit,
+                                activitiesByVisit.getOrDefault(
+                                        visit.getId(),
+                                        List.of()
+                                )
+                        )
         );
     }
 
@@ -590,6 +868,58 @@ public class VisitService
                         )
                 )
                 .toList();
+    }
+
+    private VisitExecutionReference toExecutionReference(
+            Visit visit,
+            Collection<VisitMaintenanceActivity> activities
+    ) {
+
+        List<VisitActivityExecutionReference> activityReferences =
+                activities
+                        .stream()
+                        .sorted(
+                                Comparator.comparing(
+                                        activity ->
+                                                activity
+                                                        .getMaintenanceActivityId()
+                                                        .toString()
+                                )
+                        )
+                        .map(
+                                this::toActivityExecutionReference
+                        )
+                        .toList();
+
+        return new VisitExecutionReference(
+                visit.getId(),
+                visit.getPoolId(),
+                visit.getCrewId(),
+                visit.getPlannedDate(),
+                visit.getPlannedTime(),
+                visit.getStatus(),
+                visit.getNotes(),
+                visit.getStartedAt(),
+                visit.getStartedByAccountId(),
+                visit.getStartedByEmployeeId(),
+                visit.getCompletedAt(),
+                visit.getCompletedByAccountId(),
+                visit.getCompletedByEmployeeId(),
+                activityReferences
+        );
+    }
+
+    private VisitActivityExecutionReference toActivityExecutionReference(
+            VisitMaintenanceActivity activity
+    ) {
+
+        return new VisitActivityExecutionReference(
+                activity.getMaintenanceActivityId(),
+                activity.getStatus(),
+                activity.getCompletedAt(),
+                activity.getCompletedByAccountId(),
+                activity.getCompletedByEmployeeId()
+        );
     }
 
     private String normalizeNotes(
