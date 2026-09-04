@@ -10,8 +10,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -90,6 +88,9 @@ public class VisitMaintenanceActivity {
 
         this.maintenanceActivityId =
                 maintenanceActivityId;
+
+        this.status =
+                VisitActivityStatus.PENDING;
     }
 
     public void complete(
