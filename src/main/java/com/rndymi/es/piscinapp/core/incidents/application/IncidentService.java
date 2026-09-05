@@ -30,7 +30,8 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class IncidentService {
+public class IncidentService
+        implements IncidentLookup {
 
     private final IncidentRepository incidentRepository;
     private final OperationalActorResolver operationalActorResolver;
@@ -166,6 +167,34 @@ public class IncidentService {
                                 ),
                         pageable
                 );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<IncidentReference> findIncidentsByVisitId(
+            UUID visitId
+    ) {
+
+        return incidentRepository
+                .findAllByVisitIdOrderByCreatedAtAscIdAsc(
+                        visitId
+                )
+                .stream()
+                .map(
+                        incident ->
+                                new IncidentReference(
+                                        incident.getId(),
+                                        incident.getDescription(),
+                                        incident.getStatus(),
+                                        incident.getCreatedAt(),
+                                        incident.getCreatedByAccountId(),
+                                        incident.getCreatedByEmployeeId(),
+                                        incident.getResolvedAt(),
+                                        incident.getResolvedByAccountId(),
+                                        incident.getResolvedByEmployeeId()
+                                )
+                )
+                .toList();
     }
 
     @Transactional
