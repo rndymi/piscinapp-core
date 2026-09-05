@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class VisitService
-        implements VisitLookup, VisitExecutionOperations {
+        implements VisitLookup, VisitExecutionOperations, VisitSupervisionLookup {
 
     private final VisitRepository visitRepository;
     private final VisitMaintenanceActivityRepository visitMaintenanceActivityRepository;
@@ -248,6 +248,17 @@ public class VisitService
                                 visitId
                         )
                 )
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public VisitExecutionReference requireVisitForSupervision(
+            UUID visitId
+    ) {
+
+        return requireExecutionVisit(
+                visitId
         );
     }
 

@@ -12,6 +12,9 @@ import com.rndymi.es.piscinapp.core.identity.application.exception.LastAdminConf
 import com.rndymi.es.piscinapp.core.identity.application.exception.OwnerAccountProtectedException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UserAccountNotFoundException;
 import com.rndymi.es.piscinapp.core.identity.application.exception.UsernameConflictException;
+import com.rndymi.es.piscinapp.core.incidents.application.exception.IncidentNotFoundException;
+import com.rndymi.es.piscinapp.core.incidents.application.exception.IncidentResolutionForbiddenException;
+import com.rndymi.es.piscinapp.core.incidents.application.exception.IncidentStateConflictException;
 import com.rndymi.es.piscinapp.core.maintenance.application.exception.MaintenanceActivityNotFoundException;
 import com.rndymi.es.piscinapp.core.maintenance.application.exception.PoolMaintenanceActivityConflictException;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitActivitiesPendingException;
@@ -24,6 +27,7 @@ import com.rndymi.es.piscinapp.core.planning.application.exception.VisitNotFound
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitStateConflictException;
 import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
 import com.rndymi.es.piscinapp.core.pools.application.exception.PoolNotFoundException;
+import com.rndymi.es.piscinapp.core.supervision.application.exception.VisitSupervisionForbiddenException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -427,6 +431,76 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .VISIT_INVALID_SCHEDULE,
+                request
+        );
+    }
+
+
+    @ExceptionHandler(
+            IncidentNotFoundException.class
+    )
+    ProblemDetail handleIncidentNotFound(
+            IncidentNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                ApiErrorCode
+                        .INCIDENT_NOT_FOUND,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            IncidentStateConflictException.class
+    )
+    ProblemDetail handleIncidentStateConflict(
+            IncidentStateConflictException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                ApiErrorCode
+                        .INCIDENT_STATE_CONFLICT,
+                request
+        );
+    }
+
+    @ExceptionHandler(
+            IncidentResolutionForbiddenException.class
+    )
+    ProblemDetail handleIncidentResolutionForbidden(
+            IncidentResolutionForbiddenException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                ApiErrorCode
+                        .INCIDENT_RESOLUTION_FORBIDDEN,
+                request
+        );
+    }
+
+
+    @ExceptionHandler(
+            VisitSupervisionForbiddenException.class
+    )
+    ProblemDetail handleVisitSupervisionForbidden(
+            VisitSupervisionForbiddenException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_SUPERVISION_FORBIDDEN,
                 request
         );
     }

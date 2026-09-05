@@ -24,7 +24,8 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class VisitExecutionService {
+public class VisitExecutionService
+        implements VisitObservationLookup {
 
     private final OperationalActorResolver operationalActorResolver;
     private final CrewLookup crewLookup;
@@ -219,6 +220,30 @@ public class VisitExecutionService {
                 .findAllByVisitIdOrderByCreatedAtAscIdAsc(
                         visitId
                 );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<VisitObservationReference> findObservationsByVisitId(
+            UUID visitId
+    ) {
+
+        return visitObservationRepository
+                .findAllByVisitIdOrderByCreatedAtAscIdAsc(
+                        visitId
+                )
+                .stream()
+                .map(
+                        observation ->
+                                new VisitObservationReference(
+                                        observation.getId(),
+                                        observation.getText(),
+                                        observation.getCreatedAt(),
+                                        observation.getCreatedByAccountId(),
+                                        observation.getCreatedByEmployeeId()
+                                )
+                )
+                .toList();
     }
 
     @Transactional

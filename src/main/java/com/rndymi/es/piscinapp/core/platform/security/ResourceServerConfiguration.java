@@ -73,9 +73,32 @@ public class ResourceServerConfiguration {
                                         .authenticated()
                                         .requestMatchers(
                                                 HttpMethod.POST,
-                                                "/api/v1/visits/*/observations"
+                                                "/api/v1/visits/*/observations",
+                                                "/api/v1/visits/*/incidents"
                                         )
                                         .authenticated()
+
+                                        .requestMatchers(
+                                                HttpMethod.GET,
+                                                "/api/v1/visits/*/incidents",
+                                                "/api/v1/visits/*/supervision",
+                                                "/api/v1/incidents/*"
+                                        )
+                                        .authenticated()
+
+                                        .requestMatchers(
+                                                HttpMethod.PUT,
+                                                "/api/v1/incidents/*/resolve"
+                                        )
+                                        .authenticated()
+
+                                        .requestMatchers(
+                                                HttpMethod.GET,
+                                                "/api/v1/incidents"
+                                        )
+                                        .hasRole(
+                                                "ADMIN"
+                                        )
 
                                         .requestMatchers(
                                                 "/api/v1/users/**",
