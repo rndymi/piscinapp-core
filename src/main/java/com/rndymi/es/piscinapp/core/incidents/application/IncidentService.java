@@ -13,15 +13,19 @@ import com.rndymi.es.piscinapp.core.incidents.application.exception.IncidentReso
 import com.rndymi.es.piscinapp.core.incidents.application.exception.IncidentStateConflictException;
 import com.rndymi.es.piscinapp.core.incidents.domain.Incident;
 import com.rndymi.es.piscinapp.core.incidents.persistence.IncidentRepository;
+import com.rndymi.es.piscinapp.core.incidents.persistence.IncidentSpecifications;
 import com.rndymi.es.piscinapp.core.planning.application.VisitExecutionOperations;
 import com.rndymi.es.piscinapp.core.planning.application.VisitExecutionReference;
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitStateConflictException;
 import com.rndymi.es.piscinapp.core.planning.domain.VisitStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,22 +33,11 @@ import java.util.UUID;
 public class IncidentService {
 
     private final IncidentRepository incidentRepository;
-
-    private final OperationalActorResolver
-            operationalActorResolver;
-
-    private final IdentityAccountLookup
-            identityAccountLookup;
-
-    private final EmployeeLookup
-            employeeLookup;
-
-    private final CrewLookup
-            crewLookup;
-
-    private final VisitExecutionOperations
-            visitExecutionOperations;
-
+    private final OperationalActorResolver operationalActorResolver;
+    private final IdentityAccountLookup identityAccountLookup;
+    private final EmployeeLookup employeeLookup;
+    private final CrewLookup crewLookup;
+    private final VisitExecutionOperations visitExecutionOperations;
     private final Clock clock;
 
     @Transactional
@@ -88,6 +81,90 @@ public class IncidentService {
         return incidentRepository
                 .save(
                         incident
+                );
+    }
+
+    @Transactional(readOnly = true)
+    public Incident getIncidentForActor(
+            UUID incidentId,
+            String principalName,
+            boolean admin
+    ) {
+
+        Incident incident =
+                requireIncident(
+                        incidentId
+                );
+
+        if (!admin) {
+
+            OperationalActor actor =
+                    operationalActorResolver
+                            .resolve(
+                                    principalName
+                            );
+
+            VisitExecutionReference visit =
+                    visitExecutionOperations
+                            .requireExecutionVisit(
+                                    incident.getVisitId()
+                            );
+
+            requireAssignedCrewMember(
+                    actor.employeeId(),
+                    visit
+            );
+        }
+
+        return incident;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Incident> getVisitIncidentsForActor(
+            UUID visitId,
+            String principalName,
+            boolean admin
+    ) {
+
+        VisitExecutionReference visit =
+                visitExecutionOperations
+                        .requireExecutionVisit(
+                                visitId
+                        );
+
+        if (!admin) {
+
+            OperationalActor actor =
+                    operationalActorResolver
+                            .resolve(
+                                    principalName
+                            );
+
+            requireAssignedCrewMember(
+                    actor.employeeId(),
+                    visit
+            );
+        }
+
+        return incidentRepository
+                .findAllByVisitIdOrderByCreatedAtAscIdAsc(
+                        visitId
+                );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Incident> searchIncidents(
+            IncidentSearchCriteria criteria,
+            Pageable pageable
+    ) {
+
+        return incidentRepository
+                .findAll(
+                        IncidentSpecifications
+                                .from(
+                                        criteria
+                                ),
+                        pageable
                 );
     }
 
