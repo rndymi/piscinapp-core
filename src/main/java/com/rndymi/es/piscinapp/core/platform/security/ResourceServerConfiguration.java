@@ -81,6 +81,7 @@ public class ResourceServerConfiguration {
                                         .requestMatchers(
                                                 HttpMethod.GET,
                                                 "/api/v1/visits/*/incidents",
+                                                "/api/v1/visits/*/supervision",
                                                 "/api/v1/incidents/*"
                                         )
                                         .authenticated()

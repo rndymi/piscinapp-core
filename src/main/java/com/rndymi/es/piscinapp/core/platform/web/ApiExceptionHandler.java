@@ -27,6 +27,7 @@ import com.rndymi.es.piscinapp.core.planning.application.exception.VisitNotFound
 import com.rndymi.es.piscinapp.core.planning.application.exception.VisitStateConflictException;
 import com.rndymi.es.piscinapp.core.platform.application.InactiveResourceException;
 import com.rndymi.es.piscinapp.core.pools.application.exception.PoolNotFoundException;
+import com.rndymi.es.piscinapp.core.supervision.application.exception.VisitSupervisionForbiddenException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -482,6 +483,24 @@ public class ApiExceptionHandler {
                 exception.getMessage(),
                 ApiErrorCode
                         .INCIDENT_RESOLUTION_FORBIDDEN,
+                request
+        );
+    }
+
+
+    @ExceptionHandler(
+            VisitSupervisionForbiddenException.class
+    )
+    ProblemDetail handleVisitSupervisionForbidden(
+            VisitSupervisionForbiddenException exception,
+            HttpServletRequest request
+    ) {
+
+        return problem(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                ApiErrorCode
+                        .VISIT_SUPERVISION_FORBIDDEN,
                 request
         );
     }
