@@ -2,8 +2,7 @@
 
 Backend service and functional source of truth for the PiscinApp ecosystem.
 
-Latest stable version: `v1.0.0`
-Current development version: `v1.1.0-SNAPSHOT`
+Latest stable version: `v1.1.0`
 
 ## Stack
 
@@ -207,6 +206,8 @@ FAKE_PROD is a production-shaped validation environment and is not a real public
 
 ## Current status
 
-`v1.1.0-SNAPSHOT` currently contains the minimum operational Core workflow from configuration and planning through execution, incidents and supervision.
+`v1.1.0` is the current stable operational Core MVP.
 
-Integrated FAKE_PROD validation and stable `v1.1.0` release preparation remain pending.
+The release provides the minimum end-to-end maintenance workflow from operational configuration and planning through assigned field execution, observations, incidents and supervision.
+
+Release validation covers the PostgreSQL-backed automated suite, OAuth2/OIDC and authorization boundaries, SonarCloud, CodeQL, the production Core image and the ecosystem-owned FAKE_PROD environment through Nginx.
