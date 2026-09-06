@@ -69,8 +69,7 @@ jobs:
 
       - name: Analyze with SonarCloud
         if: >
-          github.ref == 'refs/heads/develop' ||
-          startsWith(github.ref, 'refs/heads/release/v')
+          github.ref == 'refs/heads/develop'
 
         env:
           SONAR_PISCINAPP_CORE_TOKEN: ${{ secrets.SONAR_PISCINAPP_CORE_TOKEN }}

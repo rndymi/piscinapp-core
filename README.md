@@ -2,8 +2,8 @@
 
 Backend service and functional source of truth for the PiscinApp ecosystem.
 
-Latest stable version: `v1.0.0`
-Current development version: `v1.1.0-SNAPSHOT`
+Latest stable version: `v1.1.0`.
+Current development version: `v1.2.0-SNAPSHOT`.
 
 ## Stack
 
@@ -179,7 +179,7 @@ target/site/jacoco
 CI additionally validates:
 
 * PostgreSQL-backed Maven verification;
-* SonarCloud Quality Gate;
+* SonarCloud Quality Gate on `develop`;
 * CodeQL analysis;
 * production Docker image build.
 
@@ -207,6 +207,6 @@ FAKE_PROD is a production-shaped validation environment and is not a real public
 
 ## Current status
 
-`v1.1.0-SNAPSHOT` currently contains the minimum operational Core workflow from configuration and planning through execution, incidents and supervision.
+`v1.1.0` is the current stable release and provides the minimum operational Core workflow from configuration and planning through execution, incidents and supervision.
 
-Integrated FAKE_PROD validation and stable `v1.1.0` release preparation remain pending.
+The `develop` branch is prepared for `v1.2.0-SNAPSHOT`. The scope of the next version is defined by its corresponding Version Plan.
