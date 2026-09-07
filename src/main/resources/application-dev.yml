@@ -88,3 +88,7 @@ piscinapp:
     owner:
       username: local.owner
       password: local-owner-password
+
+logging:
+  level:
+    com.rndymi.es.piscinapp.core.platform.development.HttpRequestLoggingFilter: DEBUG
