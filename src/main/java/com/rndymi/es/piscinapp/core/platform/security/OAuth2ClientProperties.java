@@ -20,6 +20,9 @@ public class OAuth2ClientProperties {
     private Duration accessTokenTimeToLive =
             Duration.ofMinutes(15);
 
+    private Duration refreshTokenTimeToLive =
+            Duration.ofHours(8);
+
     private Map<String, Client> clients =
             new LinkedHashMap<>();
 
@@ -31,9 +34,20 @@ public class OAuth2ClientProperties {
 
         private String clientId;
 
-        private String redirectUri;
+        private Set<String> grantTypes =
+                new LinkedHashSet<>();
+
+        private Set<String> redirectUris =
+                new LinkedHashSet<>();
+
+        private Set<String> postLogoutRedirectUris =
+                new LinkedHashSet<>();
 
         private Set<String> scopes =
                 new LinkedHashSet<>();
+
+        private Duration accessTokenTimeToLive;
+
+        private Duration refreshTokenTimeToLive;
     }
 }

@@ -39,6 +39,10 @@ public class AuthorizationServerConfiguration {
                 }
         );
 
+        http.cors(
+                Customizer.withDefaults()
+        );
+
         http.authorizeHttpRequests(
                 authorize ->
                         authorize
