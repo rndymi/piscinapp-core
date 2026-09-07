@@ -6,6 +6,8 @@ import com.rndymi.es.piscinapp.core.incidents.application.IncidentSearchCriteria
 import com.rndymi.es.piscinapp.core.incidents.application.IncidentService;
 import com.rndymi.es.piscinapp.core.incidents.domain.Incident;
 import com.rndymi.es.piscinapp.core.incidents.domain.IncidentStatus;
+import com.rndymi.es.piscinapp.core.platform.security.AuthenticatedUser;
+import com.rndymi.es.piscinapp.core.platform.security.AuthenticatedUserResolver;
 import com.rndymi.es.piscinapp.core.platform.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,6 +39,7 @@ public class IncidentController {
 
     private final IncidentService incidentService;
     private final IncidentPageRequestFactory pageRequestFactory;
+    private final AuthenticatedUserResolver authenticatedUserResolver;
 
     @PostMapping(
             "/visits/{visitId}/incidents"
@@ -81,12 +84,17 @@ public class IncidentController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         Incident incident =
                 incidentService
                         .createIncident(
                                 visitId,
                                 request.description(),
-                                authentication.getName()
+                                user.username()
                         );
 
         IncidentResponse response =
@@ -143,13 +151,16 @@ public class IncidentController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         return incidentService
                 .getVisitIncidentsForActor(
                         visitId,
-                        authentication.getName(),
-                        isAdmin(
-                                authentication
-                        )
+                        user.username(),
+                        user.admin()
                 )
                 .stream()
                 .map(
@@ -193,15 +204,18 @@ public class IncidentController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         return IncidentResponse
                 .from(
                         incidentService
                                 .getIncidentForActor(
                                         incidentId,
-                                        authentication.getName(),
-                                        isAdmin(
-                                                authentication
-                                        )
+                                        user.username(),
+                                        user.admin()
                                 )
                 );
     }
@@ -321,33 +335,19 @@ public class IncidentController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         return IncidentResponse
                 .from(
                         incidentService
                                 .resolveIncident(
                                         incidentId,
-                                        authentication.getName(),
-                                        isAdmin(
-                                                authentication
-                                        )
+                                        user.username(),
+                                        user.admin()
                                 )
-                );
-    }
-
-    private boolean isAdmin(
-            Authentication authentication
-    ) {
-
-        return authentication
-                .getAuthorities()
-                .stream()
-                .anyMatch(
-                        authority ->
-                                "ROLE_ADMIN"
-                                        .equals(
-                                                authority
-                                                        .getAuthority()
-                                        )
                 );
     }
 }
