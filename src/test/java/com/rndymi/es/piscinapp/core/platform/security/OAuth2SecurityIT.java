@@ -628,6 +628,185 @@ class OAuth2SecurityIT {
                 );
     }
 
+
+    @Test
+    void shouldIssueRotateAndRejectReusedRefreshTokenForControl()
+            throws Exception {
+
+        userAccountService.createAccount(
+                "oauth.control",
+                PASSWORD,
+                true,
+                Set.of(
+                        SecurityRole.USER
+                )
+        );
+
+        String verifier =
+                "piscinapp-control-refresh-verifier-123456789012345678901234567890";
+
+        String code =
+                obtainAuthorizationCode(
+                        "oauth.control",
+                        verifier,
+                        CONTROL_CLIENT_ID,
+                        CONTROL_REDIRECT_URI,
+                        "openid profile offline_access"
+                );
+
+        MvcResult tokenResult =
+                mockMvc.perform(
+                                post("/oauth2/token")
+                                        .contentType(
+                                                MediaType
+                                                        .APPLICATION_FORM_URLENCODED
+                                        )
+                                        .param(
+                                                "grant_type",
+                                                "authorization_code"
+                                        )
+                                        .param(
+                                                "client_id",
+                                                CONTROL_CLIENT_ID
+                                        )
+                                        .param(
+                                                "code",
+                                                code
+                                        )
+                                        .param(
+                                                "redirect_uri",
+                                                CONTROL_REDIRECT_URI
+                                        )
+                                        .param(
+                                                "code_verifier",
+                                                verifier
+                                        )
+                        )
+                        .andExpect(
+                                status().isOk()
+                        )
+                        .andReturn();
+
+        String tokenResponse =
+                tokenResult.getResponse()
+                        .getContentAsString();
+
+        String accessToken =
+                JsonPath.read(
+                        tokenResponse,
+                        "$.access_token"
+                );
+
+        String refreshToken =
+                JsonPath.read(
+                        tokenResponse,
+                        "$.refresh_token"
+                );
+
+        assertThat(accessToken)
+                .isNotBlank();
+
+        assertThat(refreshToken)
+                .isNotBlank();
+
+        mockMvc.perform(
+                        get("/api/v1/me")
+                                .header(
+                                        "Authorization",
+                                        "Bearer "
+                                                + accessToken
+                                )
+                )
+                .andExpect(
+                        status().isOk()
+                );
+
+        MvcResult refreshResult =
+                mockMvc.perform(
+                                post("/oauth2/token")
+                                        .contentType(
+                                                MediaType
+                                                        .APPLICATION_FORM_URLENCODED
+                                        )
+                                        .param(
+                                                "grant_type",
+                                                "refresh_token"
+                                        )
+                                        .param(
+                                                "client_id",
+                                                CONTROL_CLIENT_ID
+                                        )
+                                        .param(
+                                                "refresh_token",
+                                                refreshToken
+                                        )
+                        )
+                        .andExpect(
+                                status().isOk()
+                        )
+                        .andReturn();
+
+        String refreshResponse =
+                refreshResult.getResponse()
+                        .getContentAsString();
+
+        String refreshedAccessToken =
+                JsonPath.read(
+                        refreshResponse,
+                        "$.access_token"
+                );
+
+        String rotatedRefreshToken =
+                JsonPath.read(
+                        refreshResponse,
+                        "$.refresh_token"
+                );
+
+        assertThat(refreshedAccessToken)
+                .isNotBlank();
+
+        assertThat(rotatedRefreshToken)
+                .isNotBlank()
+                .isNotEqualTo(
+                        refreshToken
+                );
+
+        mockMvc.perform(
+                        get("/api/v1/me")
+                                .header(
+                                        "Authorization",
+                                        "Bearer "
+                                                + refreshedAccessToken
+                                )
+                )
+                .andExpect(
+                        status().isOk()
+                );
+
+        mockMvc.perform(
+                        post("/oauth2/token")
+                                .contentType(
+                                        MediaType
+                                                .APPLICATION_FORM_URLENCODED
+                                )
+                                .param(
+                                        "grant_type",
+                                        "refresh_token"
+                                )
+                                .param(
+                                        "client_id",
+                                        CONTROL_CLIENT_ID
+                                )
+                                .param(
+                                        "refresh_token",
+                                        refreshToken
+                                )
+                )
+                .andExpect(
+                        status().isBadRequest()
+                );
+    }
+
     @Test
     void shouldRejectExpiredToken()
             throws Exception {
