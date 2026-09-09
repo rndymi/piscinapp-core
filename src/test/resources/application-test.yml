@@ -19,17 +19,65 @@ piscinapp:
   security:
     issuer: http://localhost:8080
 
+    cors:
+      allowed-origins:
+        - https://control.example.test
+
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+
+      allowed-headers:
+        - Authorization
+        - Content-Type
+        - Accept
+
+      allow-credentials: false
+      max-age: 1h
+
     oauth2:
       access-token-time-to-live: 15m
+      refresh-token-time-to-live: 8h
 
       clients:
         test:
           enabled: true
           client-id: piscinapp-test
-          redirect-uri: https://client.example.test/callback
+
+          grant-types:
+            - authorization_code
+
+          redirect-uris:
+            - https://client.example.test/callback
+
           scopes:
             - openid
             - profile
+
+        control:
+          enabled: true
+          client-id: piscinapp-control-test
+
+          grant-types:
+            - authorization_code
+            - refresh_token
+
+          redirect-uris:
+            - https://control.example.test/callback
+            - https://control-alt.example.test/callback
+
+          post-logout-redirect-uris:
+            - https://control.example.test
+            - https://control-alt.example.test
+
+          scopes:
+            - openid
+            - profile
+            - offline_access
 
   bootstrap:
     owner:

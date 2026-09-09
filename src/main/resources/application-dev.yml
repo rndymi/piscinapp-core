@@ -26,19 +26,69 @@ piscinapp:
   security:
     issuer: ${PISCINAPP_SECURITY_ISSUER:http://localhost:8080}
 
+    cors:
+      allowed-origins:
+        - http://localhost:4200
+
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+
+      allowed-headers:
+        - Authorization
+        - Content-Type
+        - Accept
+
+      allow-credentials: false
+      max-age: 1h
+
     oauth2:
       access-token-time-to-live: 15m
+      refresh-token-time-to-live: 8h
 
       clients:
         swagger:
           enabled: true
           client-id: piscinapp-swagger
-          redirect-uri: http://localhost:8080/swagger-ui/oauth2-redirect.html
+
+          grant-types:
+            - authorization_code
+
+          redirect-uris:
+            - http://localhost:8080/swagger-ui/oauth2-redirect.html
+
           scopes:
             - openid
             - profile
+
+        control:
+          enabled: true
+          client-id: piscinapp-control
+
+          grant-types:
+            - authorization_code
+            - refresh_token
+
+          redirect-uris:
+            - http://localhost:4200/callback
+
+          post-logout-redirect-uris:
+            - http://localhost:4200
+
+          scopes:
+            - openid
+            - profile
+            - offline_access
 
   bootstrap:
     owner:
       username: local.owner
       password: local-owner-password
+
+logging:
+  level:
+    com.rndymi.es.piscinapp.core.platform.development.HttpRequestLoggingFilter: DEBUG

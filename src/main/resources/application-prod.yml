@@ -29,17 +29,63 @@ piscinapp:
       key-alias: ${JWT_KEY_ALIAS}
       key-id: ${JWT_KEY_ID}
 
+    cors:
+      allowed-origins:
+        - ${PISCINAPP_CORS_ALLOWED_ORIGIN:}
+
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+
+      allowed-headers:
+        - Authorization
+        - Content-Type
+        - Accept
+
+      allow-credentials: false
+      max-age: ${PISCINAPP_CORS_MAX_AGE:1h}
+
     oauth2:
       access-token-time-to-live: ${PISCINAPP_ACCESS_TOKEN_TTL:15m}
+      refresh-token-time-to-live: ${PISCINAPP_REFRESH_TOKEN_TTL:8h}
 
       clients:
         validation:
           enabled: ${PISCINAPP_VALIDATION_CLIENT_ENABLED:false}
           client-id: ${PISCINAPP_VALIDATION_CLIENT_ID:piscinapp-validation}
-          redirect-uri: ${PISCINAPP_VALIDATION_CLIENT_REDIRECT_URI:}
+
+          grant-types:
+            - authorization_code
+
+          redirect-uris:
+            - ${PISCINAPP_VALIDATION_CLIENT_REDIRECT_URI:}
+
           scopes:
             - openid
             - profile
+
+        control:
+          enabled: ${PISCINAPP_CONTROL_CLIENT_ENABLED:false}
+          client-id: ${PISCINAPP_CONTROL_CLIENT_ID:piscinapp-control}
+
+          grant-types:
+            - authorization_code
+            - refresh_token
+
+          redirect-uris:
+            - ${PISCINAPP_CONTROL_REDIRECT_URI:}
+
+          post-logout-redirect-uris:
+            - ${PISCINAPP_CONTROL_POST_LOGOUT_REDIRECT_URI:}
+
+          scopes:
+            - openid
+            - profile
+            - offline_access
 
   bootstrap:
     owner:

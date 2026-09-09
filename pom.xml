@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.rndymi.es</groupId>
     <artifactId>piscinapp-core</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
     <name>piscinapp-core</name>
     <description>Core backend service for the PiscinApp ecosystem</description>

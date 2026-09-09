@@ -9,6 +9,8 @@ import com.rndymi.es.piscinapp.core.execution.domain.VisitObservation;
 import com.rndymi.es.piscinapp.core.planning.application.VisitActivityExecutionReference;
 import com.rndymi.es.piscinapp.core.planning.application.VisitExecutionReference;
 import com.rndymi.es.piscinapp.core.planning.domain.VisitStatus;
+import com.rndymi.es.piscinapp.core.platform.security.AuthenticatedUser;
+import com.rndymi.es.piscinapp.core.platform.security.AuthenticatedUserResolver;
 import com.rndymi.es.piscinapp.core.platform.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,6 +44,7 @@ public class VisitExecutionController {
 
     private final VisitExecutionService visitExecutionService;
     private final AssignedVisitPageRequestFactory pageRequestFactory;
+    private final AuthenticatedUserResolver authenticatedUserResolver;
 
     @GetMapping(
             "/assigned"
@@ -106,10 +109,15 @@ public class VisitExecutionController {
             VisitStatus status
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         Page<VisitExecutionReference> visits =
                 visitExecutionService
                         .findAssignedVisits(
-                                authentication.getName(),
+                                user.username(),
                                 date,
                                 fromDate,
                                 toDate,
@@ -141,10 +149,13 @@ public class VisitExecutionController {
             Authentication authentication
     ) {
 
-        VisitExecutionReference visit =
-                isAdmin(
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
                         authentication
-                )
+                );
+
+        VisitExecutionReference visit =
+                user.admin()
                         ?
                         visitExecutionService
                                 .getExecutionDetailForAdmin(
@@ -154,7 +165,7 @@ public class VisitExecutionController {
                         visitExecutionService
                                 .getExecutionDetailForAssignedActor(
                                         visitId,
-                                        authentication.getName()
+                                        user.username()
                                 );
 
         return VisitExecutionResponse.from(
@@ -175,11 +186,16 @@ public class VisitExecutionController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         return VisitExecutionResponse.from(
                 visitExecutionService
                         .startVisit(
                                 visitId,
-                                authentication.getName()
+                                user.username()
                         )
         );
     }
@@ -199,12 +215,17 @@ public class VisitExecutionController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         VisitActivityExecutionReference activity =
                 visitExecutionService
                         .completeActivity(
                                 visitId,
                                 activityId,
-                                authentication.getName()
+                                user.username()
                         );
 
         return VisitActivityExecutionResponse.from(
@@ -229,12 +250,17 @@ public class VisitExecutionController {
             CreateVisitObservationRequest request
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         VisitObservation observation =
                 visitExecutionService
                         .addObservation(
                                 visitId,
                                 request.text(),
-                                authentication.getName()
+                                user.username()
                         );
 
         VisitObservationResponse response =
@@ -270,10 +296,13 @@ public class VisitExecutionController {
             Authentication authentication
     ) {
 
-        List<VisitObservation> observations =
-                isAdmin(
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
                         authentication
-                )
+                );
+
+        List<VisitObservation> observations =
+                user.admin()
                         ?
                         visitExecutionService
                                 .getObservationsForAdmin(
@@ -283,7 +312,7 @@ public class VisitExecutionController {
                         visitExecutionService
                                 .getObservationsForAssignedActor(
                                         visitId,
-                                        authentication.getName()
+                                        user.username()
                                 );
 
         return observations
@@ -307,29 +336,17 @@ public class VisitExecutionController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         return VisitExecutionResponse.from(
                 visitExecutionService
                         .completeVisit(
                                 visitId,
-                                authentication.getName()
+                                user.username()
                         )
         );
-    }
-
-    private boolean isAdmin(
-            Authentication authentication
-    ) {
-
-        return authentication
-                .getAuthorities()
-                .stream()
-                .anyMatch(
-                        authority ->
-                                "ROLE_ADMIN"
-                                        .equals(
-                                                authority
-                                                        .getAuthority()
-                                        )
-                );
     }
 }

@@ -2,7 +2,7 @@
 
 Backend service and functional source of truth for the PiscinApp ecosystem.
 
-Latest stable version: `v1.1.0`
+Latest stable version: `v1.1.1`
 
 ## Stack
 
@@ -206,7 +206,7 @@ FAKE_PROD is a production-shaped validation environment and is not a real public
 
 ## Current status
 
-`v1.1.0` is the current stable operational Core MVP.
+`v1.1.1` is the current stable operational Core MVP.
 
 The release provides the minimum end-to-end maintenance workflow from operational configuration and planning through assigned field execution, observations, incidents and supervision.
 

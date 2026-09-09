@@ -53,6 +53,12 @@ class OAuth2SecurityIT {
     private static final String PASSWORD =
             "oauth2-password-123";
 
+    private static final String CONTROL_CLIENT_ID =
+            "piscinapp-control-test";
+
+    private static final String CONTROL_REDIRECT_URI =
+            "https://control.example.test/callback";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -762,8 +768,28 @@ class OAuth2SecurityIT {
     )
             throws Exception {
 
+        return obtainAuthorizationCode(
+                username,
+                verifier,
+                CLIENT_ID,
+                REDIRECT_URI,
+                "openid profile"
+        );
+    }
+
+    private String obtainAuthorizationCode(
+            String username,
+            String verifier,
+            String clientId,
+            String redirectUri,
+            String scope
+    )
+            throws Exception {
+
         MockHttpSession session =
-                login(username);
+                login(
+                        username
+                );
 
         String challenge =
                 createCodeChallenge(
@@ -773,22 +799,24 @@ class OAuth2SecurityIT {
         MvcResult result =
                 mockMvc.perform(
                                 get("/oauth2/authorize")
-                                        .session(session)
+                                        .session(
+                                                session
+                                        )
                                         .queryParam(
                                                 "response_type",
                                                 "code"
                                         )
                                         .queryParam(
                                                 "client_id",
-                                                CLIENT_ID
+                                                clientId
                                         )
                                         .queryParam(
                                                 "redirect_uri",
-                                                REDIRECT_URI
+                                                redirectUri
                                         )
                                         .queryParam(
                                                 "scope",
-                                                "openid profile"
+                                                scope
                                         )
                                         .queryParam(
                                                 "code_challenge",

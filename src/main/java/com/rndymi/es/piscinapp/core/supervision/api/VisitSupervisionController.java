@@ -1,5 +1,7 @@
 package com.rndymi.es.piscinapp.core.supervision.api;
 
+import com.rndymi.es.piscinapp.core.platform.security.AuthenticatedUser;
+import com.rndymi.es.piscinapp.core.platform.security.AuthenticatedUserResolver;
 import com.rndymi.es.piscinapp.core.supervision.api.dto.VisitSupervisionResponse;
 import com.rndymi.es.piscinapp.core.supervision.application.SupervisionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class VisitSupervisionController {
 
     private final SupervisionService supervisionService;
+    private final AuthenticatedUserResolver authenticatedUserResolver;
 
     @GetMapping(
             "/{visitId}/supervision"
@@ -58,32 +61,18 @@ public class VisitSupervisionController {
             Authentication authentication
     ) {
 
+        AuthenticatedUser user =
+                authenticatedUserResolver.resolve(
+                        authentication
+                );
+
         return VisitSupervisionResponse.from(
                 supervisionService
                         .getVisitSupervision(
                                 visitId,
-                                authentication.getName(),
-                                isAdmin(
-                                        authentication
-                                )
+                                user.username(),
+                                user.admin()
                         )
         );
-    }
-
-    private boolean isAdmin(
-            Authentication authentication
-    ) {
-
-        return authentication
-                .getAuthorities()
-                .stream()
-                .anyMatch(
-                        authority ->
-                                "ROLE_ADMIN"
-                                        .equals(
-                                                authority
-                                                        .getAuthority()
-                                        )
-                );
     }
 }
