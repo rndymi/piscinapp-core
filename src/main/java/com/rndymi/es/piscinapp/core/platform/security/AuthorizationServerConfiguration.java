@@ -48,6 +48,9 @@ import java.util.Map;
 @Configuration
 public class AuthorizationServerConfiguration {
 
+    private static final SecureRandom SECURE_RANDOM =
+            new SecureRandom();
+
     @Bean
     @Order(1)
     SecurityFilterChain authorizationServerSecurityFilterChain(
@@ -140,9 +143,6 @@ public class AuthorizationServerConfiguration {
         OAuth2AccessTokenGenerator accessTokenGenerator =
                 new OAuth2AccessTokenGenerator();
 
-        SecureRandom secureRandom =
-                new SecureRandom();
-
         OAuth2TokenGenerator<OAuth2RefreshToken>
                 refreshTokenGenerator =
                 context -> {
@@ -159,7 +159,7 @@ public class AuthorizationServerConfiguration {
                     byte[] tokenBytes =
                             new byte[96];
 
-                    secureRandom.nextBytes(
+                    SECURE_RANDOM.nextBytes(
                             tokenBytes
                     );
 
